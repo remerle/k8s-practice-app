@@ -1,4 +1,5 @@
 import { writable, derived } from 'svelte/store';
+import { browser } from '$app/environment';
 
 export interface CartItem {
   productId: number;
@@ -8,8 +9,27 @@ export interface CartItem {
   quantity: number;
 }
 
+const STORAGE_KEY = 'k8s-shop-cart';
+
+function loadCart(): CartItem[] {
+  if (!browser) return [];
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+}
+
 function createCart() {
-  const { subscribe, set, update } = writable<CartItem[]>([]);
+  const { subscribe, set, update } = writable<CartItem[]>(loadCart());
+
+  if (browser) {
+    subscribe((items) => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    });
+  }
+
   return {
     subscribe,
     addItem(product: Omit<CartItem, 'quantity'>) {

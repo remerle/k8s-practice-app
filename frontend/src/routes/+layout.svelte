@@ -1,6 +1,7 @@
 <script lang="ts">
   import '../app.css';
   import { page } from '$app/stores';
+  import { cartCount } from '$lib/stores/cart';
 
   let { children } = $props();
 </script>
@@ -10,7 +11,7 @@
     <a href="/" class="logo">K8s Shop</a>
     <div class="nav-links">
       <a href="/">Products</a>
-      <a href="/cart">Cart</a>
+      <a href="/cart">Cart ({$cartCount})</a>
       <a href="/admin">Admin</a>
     </div>
   </div>

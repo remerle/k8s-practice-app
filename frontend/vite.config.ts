@@ -5,5 +5,6 @@ export default defineConfig({
   plugins: [sveltekit()],
   test: {
     include: ['tests/**/*.test.ts'],
+    alias: { '$app/environment': '/tests/mocks/app-environment.ts' },
   },
 });
