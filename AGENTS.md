@@ -25,13 +25,25 @@ just migrate       # Run Knex migrations (requires Postgres)
 
 Always run `just validate` before committing.
 
+## Configuration
+
+All config is via environment variables. See the README Configuration section for the full table.
+
+Key points for agents:
+
+- **Backend** requires `DATABASE_URL` and `FIREBASE_PROJECT_ID`. Listens on `PORT` (default 3000), binds `0.0.0.0`.
+- **Frontend** requires `API_URL` and all `FIREBASE_*` vars. Listens on `PORT` (default 3000 via adapter-node).
+- **Runtime env**: The frontend reads env at runtime via `$env/dynamic/private` in `+layout.server.ts`, not at build time. No `PUBLIC_` prefixed vars.
+- **Image storage**: Backend stores uploaded images to `IMAGE_STORAGE_PATH` (default `./images`) and serves them at `/images/`.
+- **Health check**: `GET /api/health` returns 200 with DB up, 503 with DB down.
+
 ## Architecture Decisions
 
-- **Runtime env config**: The frontend reads environment variables at runtime via `+layout.server.ts` using `$env/dynamic/private`, not build-time `PUBLIC_` prefixed vars. This supports K8s ConfigMap injection.
+- **Runtime env config**: Supports swapping config per deployment without rebuilding.
 - **No ORM**: Knex query builder only. Keep queries in route handlers; no separate repository layer.
 - **Auth is admin-only**: Firebase Google auth protects `/admin` routes. The storefront is fully public. Cart lives in localStorage.
-- **Image storage**: Uploaded to a directory on disk (PVC in K8s). Backend serves them via `@fastify/static` at `/images/`.
-- **Auto-migration**: The Knex db plugin runs `migrate.latest()` on startup. Safe for K8s rolling deploys since migrations are additive.
+- **Image storage on disk**: Backend writes to and serves from a configurable directory. The path is set via `IMAGE_STORAGE_PATH`.
+- **Auto-migration**: The Knex db plugin runs `migrate.latest()` on startup. Migrations must be additive (no column drops or renames).
 
 ## Conventions
 
@@ -75,7 +87,7 @@ Always run `just validate` before committing.
 ```
 backend/src/
 ├── config.ts              # Env var loading
-├── index.ts               # Server entry point
+├── index.ts               # Server entry point (binds 0.0.0.0:PORT)
 ├── plugins/
 │   ├── db.ts              # Knex connection + auto-migrate
 │   └── firebase.ts        # Firebase Admin + token verification
@@ -99,7 +111,7 @@ frontend/src/
 │       ├── ProductCard.svelte
 │       └── CartItem.svelte
 └── routes/
-    ├── +layout.server.ts  # Runtime env config
+    ├── +layout.server.ts  # Runtime env config (reads all env vars)
     ├── +layout.svelte     # Nav with cart count
     ├── +page.svelte       # Product listing
     ├── products/[id]/     # Product detail
