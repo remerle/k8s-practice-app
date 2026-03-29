@@ -39,9 +39,7 @@
     {#if error}
       <p class="error">{error}</p>
     {/if}
-    <button class="btn-primary login-btn" onclick={handleLogin}>
-      Sign in with Google
-    </button>
+    <button class="btn-primary login-btn" onclick={handleLogin}> Sign in with Google </button>
   </div>
 </div>
 

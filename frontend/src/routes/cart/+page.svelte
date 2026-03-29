@@ -12,7 +12,11 @@
 {#if $cartCount === 0}
   <div class="empty">
     <p>Your cart is empty.</p>
-    <a href="/" class="btn-primary" style="display:inline-block;padding:0.75rem 1.5rem;text-decoration:none">
+    <a
+      href="/"
+      class="btn-primary"
+      style="display:inline-block;padding:0.75rem 1.5rem;text-decoration:none"
+    >
       Browse Products
     </a>
   </div>

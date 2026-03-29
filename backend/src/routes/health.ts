@@ -5,7 +5,7 @@ const healthRoutes: FastifyPluginAsync = async (app) => {
     try {
       await app.knex.raw('SELECT 1');
       return { status: 'ok' };
-    } catch (err) {
+    } catch (_err) {
       reply.status(503);
       return { status: 'error', message: 'Database connection failed' };
     }

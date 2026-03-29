@@ -4,8 +4,12 @@ import { buildApp, seedProducts } from '../helper.js';
 describe('GET /api/products', () => {
   let app: Awaited<ReturnType<typeof buildApp>>;
 
-  beforeEach(async () => { app = await buildApp(); });
-  afterEach(async () => { await app.close(); });
+  beforeEach(async () => {
+    app = await buildApp();
+  });
+  afterEach(async () => {
+    await app.close();
+  });
 
   it('returns empty array when no products exist', async () => {
     const res = await app.inject({ method: 'GET', url: '/api/products' });
@@ -27,8 +31,12 @@ describe('GET /api/products', () => {
 describe('GET /api/products/:id', () => {
   let app: Awaited<ReturnType<typeof buildApp>>;
 
-  beforeEach(async () => { app = await buildApp(); });
-  afterEach(async () => { await app.close(); });
+  beforeEach(async () => {
+    app = await buildApp();
+  });
+  afterEach(async () => {
+    await app.close();
+  });
 
   it('returns a single product by id', async () => {
     await seedProducts(app);

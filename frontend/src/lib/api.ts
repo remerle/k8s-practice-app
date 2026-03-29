@@ -30,7 +30,11 @@ export async function fetchProduct(apiUrl: string, id: number): Promise<Product>
   return res.json();
 }
 
-export async function createProduct(apiUrl: string, token: string, data: FormData): Promise<Product> {
+export async function createProduct(
+  apiUrl: string,
+  token: string,
+  data: FormData,
+): Promise<Product> {
   const res = await fetch(`${apiUrl}/api/products`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
@@ -43,7 +47,12 @@ export async function createProduct(apiUrl: string, token: string, data: FormDat
   return res.json();
 }
 
-export async function updateProduct(apiUrl: string, token: string, id: number, data: FormData): Promise<Product> {
+export async function updateProduct(
+  apiUrl: string,
+  token: string,
+  id: number,
+  data: FormData,
+): Promise<Product> {
   const res = await fetch(`${apiUrl}/api/products/${id}`, {
     method: 'PUT',
     headers: { Authorization: `Bearer ${token}` },

@@ -13,10 +13,15 @@ export async function buildApp() {
   const app = Fastify({ logger: false });
 
   const knex = Knex.default({ client: 'pg', connection: TEST_DB_URL });
-  const dbPlugin = fp(async (instance) => {
-    instance.decorate('knex', knex);
-    instance.addHook('onClose', async () => { await knex.destroy(); });
-  }, { name: 'db' });
+  const dbPlugin = fp(
+    async (instance) => {
+      instance.decorate('knex', knex);
+      instance.addHook('onClose', async () => {
+        await knex.destroy();
+      });
+    },
+    { name: 'db' },
+  );
 
   await app.register(dbPlugin);
   await app.register(productRoutes);

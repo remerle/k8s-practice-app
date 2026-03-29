@@ -37,7 +37,7 @@ function createCart() {
         const existing = items.find((i) => i.productId === product.productId);
         if (existing) {
           return items.map((i) =>
-            i.productId === product.productId ? { ...i, quantity: i.quantity + 1 } : i
+            i.productId === product.productId ? { ...i, quantity: i.quantity + 1 } : i,
           );
         }
         return [...items, { ...product, quantity: 1 }];
@@ -51,9 +51,7 @@ function createCart() {
         update((items) => items.filter((i) => i.productId !== productId));
         return;
       }
-      update((items) =>
-        items.map((i) => (i.productId === productId ? { ...i, quantity } : i))
-      );
+      update((items) => items.map((i) => (i.productId === productId ? { ...i, quantity } : i)));
     },
     clear() {
       set([]);
@@ -64,9 +62,9 @@ function createCart() {
 export const cart = createCart();
 
 export const cartTotal = derived(cart, ($cart) =>
-  $cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  $cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
 );
 
 export const cartCount = derived(cart, ($cart) =>
-  $cart.reduce((sum, item) => sum + item.quantity, 0)
+  $cart.reduce((sum, item) => sum + item.quantity, 0),
 );

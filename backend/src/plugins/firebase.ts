@@ -24,7 +24,7 @@ const firebasePlugin: FastifyPluginAsync = async (app) => {
     const token = authHeader.slice(7);
     try {
       await admin.auth().verifyIdToken(token);
-    } catch (err) {
+    } catch (_err) {
       reply.status(401).send({ error: 'Invalid or expired token' });
     }
   });

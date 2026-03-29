@@ -1,6 +1,5 @@
 <script lang="ts">
   import '../app.css';
-  import { page } from '$app/stores';
   import { cartCount } from '$lib/stores/cart';
 
   let { children } = $props();

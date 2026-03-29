@@ -75,7 +75,9 @@
           <td><code>{product.sku}</code></td>
           <td>${parseFloat(product.price).toFixed(2)}</td>
           <td class="actions">
-            <a href="/admin/edit/{product.id}" class="btn-secondary" style="text-decoration:none">Edit</a>
+            <a href="/admin/edit/{product.id}" class="btn-secondary" style="text-decoration:none"
+              >Edit</a
+            >
             <button class="btn-danger" onclick={() => handleDelete(product)}>Delete</button>
           </td>
         </tr>
@@ -101,7 +103,8 @@
     overflow: hidden;
   }
 
-  th, td {
+  th,
+  td {
     padding: 0.75rem 1rem;
     text-align: left;
     border-bottom: 1px solid var(--color-border);

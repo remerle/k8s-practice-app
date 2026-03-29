@@ -16,7 +16,9 @@
       imageLocation: product.image_location,
     });
     added = true;
-    setTimeout(() => { added = false; }, 2000);
+    setTimeout(() => {
+      added = false;
+    }, 2000);
   }
 </script>
 

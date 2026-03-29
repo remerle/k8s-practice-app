@@ -1,5 +1,11 @@
 import { writable } from 'svelte/store';
-import { onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider, type User } from 'firebase/auth';
+import {
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut,
+  GoogleAuthProvider,
+  type User,
+} from 'firebase/auth';
 import { getFirebaseAuth } from '$lib/firebase';
 
 export const user = writable<User | null>(null);

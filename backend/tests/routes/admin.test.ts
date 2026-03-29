@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import Fastify from 'fastify';
 import Knex from 'knex';
 import fp from 'fastify-plugin';
@@ -16,16 +16,24 @@ async function buildAdminApp() {
 
   const imageDir = fs.mkdtempSync(path.join(os.tmpdir(), 'test-images-'));
 
-  const dbPlugin = fp(async (instance) => {
-    instance.decorate('knex', knex);
-    instance.addHook('onClose', async () => { await knex.destroy(); });
-  }, { name: 'db' });
+  const dbPlugin = fp(
+    async (instance) => {
+      instance.decorate('knex', knex);
+      instance.addHook('onClose', async () => {
+        await knex.destroy();
+      });
+    },
+    { name: 'db' },
+  );
 
-  const fakeAuth = fp(async (instance) => {
-    instance.decorate('verifyFirebaseToken', async () => {
-      // no-op in tests: all requests are authorized
-    });
-  }, { name: 'firebase' });
+  const fakeAuth = fp(
+    async (instance) => {
+      instance.decorate('verifyFirebaseToken', async () => {
+        // no-op in tests: all requests are authorized
+      });
+    },
+    { name: 'firebase' },
+  );
 
   await app.register(multipart, { limits: { fileSize: 5 * 1024 * 1024 } });
   await app.register(dbPlugin);
@@ -42,13 +50,13 @@ async function buildAdminApp() {
 
 describe('POST /api/products', () => {
   let app: Awaited<ReturnType<typeof Fastify>>;
-  let knex: Knex.Knex;
+  let _knex: Knex.Knex;
   let imageDir: string;
 
   beforeEach(async () => {
     const built = await buildAdminApp();
     app = built.app;
-    knex = built.knex;
+    _knex = built.knex;
     imageDir = built.imageDir;
   });
 
@@ -112,7 +120,7 @@ describe('DELETE /api/products/:id', () => {
 
   it('deletes a product', async () => {
     const [product] = await knex('products')
-      .insert({ name: 'Delete Me', sku: 'DEL-001', price: 5.00 })
+      .insert({ name: 'Delete Me', sku: 'DEL-001', price: 5.0 })
       .returning('*');
 
     const res = await app.inject({

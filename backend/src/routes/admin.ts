@@ -34,7 +34,8 @@ const adminRoutes: FastifyPluginAsync = async (app) => {
       return { error: 'Missing required fields: name, sku, price' };
     }
 
-    const [product] = await app.knex('products')
+    const [product] = await app
+      .knex('products')
       .insert({
         name: fields.name,
         description: fields.description ?? null,
@@ -85,10 +86,7 @@ const adminRoutes: FastifyPluginAsync = async (app) => {
     if (fields.price) updates.price = fields.price;
     if (imageLocation !== undefined) updates.image_location = imageLocation;
 
-    const [product] = await app.knex('products')
-      .where({ id })
-      .update(updates)
-      .returning('*');
+    const [product] = await app.knex('products').where({ id }).update(updates).returning('*');
 
     return product;
   });

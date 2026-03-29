@@ -25,15 +25,8 @@
     <p class="item-price">${item.price.toFixed(2)}</p>
   </div>
   <div class="item-controls">
-    <input
-      type="number"
-      min="1"
-      value={item.quantity}
-      onchange={handleQuantityChange}
-    />
-    <button class="btn-danger" onclick={() => cart.removeItem(item.productId)}>
-      Remove
-    </button>
+    <input type="number" min="1" value={item.quantity} onchange={handleQuantityChange} />
+    <button class="btn-danger" onclick={() => cart.removeItem(item.productId)}> Remove </button>
   </div>
   <div class="item-subtotal">
     ${(item.price * item.quantity).toFixed(2)}

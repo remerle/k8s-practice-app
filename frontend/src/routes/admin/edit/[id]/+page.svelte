@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
-  import { fetchProduct, updateProduct, type Product } from '$lib/api';
+  import { fetchProduct, updateProduct } from '$lib/api';
   import { getIdToken } from '$lib/stores/auth';
 
   const apiUrl = $derived($page.data.apiUrl);
