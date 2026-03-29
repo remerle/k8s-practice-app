@@ -1,0 +1,31 @@
+name: Build Frontend Image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ghcr.io/remerle/k8s-practice-frontend:${{ github.sha }}
+            ghcr.io/remerle/k8s-practice-frontend:latest
