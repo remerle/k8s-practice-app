@@ -1,0 +1,108 @@
+# Agent Instructions
+
+Instructions for AI coding agents working in this repository.
+
+## Project Overview
+
+Monorepo with two deployable packages:
+
+- `frontend/` - SvelteKit 2 (Svelte 5) with adapter-node
+- `backend/` - Fastify 5 with TypeScript, Knex, PostgreSQL
+
+Both packages use ES modules (`"type": "module"`). The root uses npm workspaces.
+
+## Key Commands
+
+```bash
+just install       # Install all dependencies
+just dev           # Run frontend + backend concurrently
+just format        # Prettier (includes Svelte files)
+just lint          # ESLint
+just test          # Run all tests
+just validate      # Full check: format, lint, typecheck, tests
+just migrate       # Run Knex migrations (requires Postgres)
+```
+
+Always run `just validate` before committing.
+
+## Architecture Decisions
+
+- **Runtime env config**: The frontend reads environment variables at runtime via `+layout.server.ts` using `$env/dynamic/private`, not build-time `PUBLIC_` prefixed vars. This supports K8s ConfigMap injection.
+- **No ORM**: Knex query builder only. Keep queries in route handlers; no separate repository layer.
+- **Auth is admin-only**: Firebase Google auth protects `/admin` routes. The storefront is fully public. Cart lives in localStorage.
+- **Image storage**: Uploaded to a directory on disk (PVC in K8s). Backend serves them via `@fastify/static` at `/images/`.
+- **Auto-migration**: The Knex db plugin runs `migrate.latest()` on startup. Safe for K8s rolling deploys since migrations are additive.
+
+## Conventions
+
+### Backend
+
+- Routes are Fastify plugins in `src/routes/`. Register them in `src/index.ts`.
+- Shared plugins (db, firebase) use `fastify-plugin` and decorate the app instance.
+- Config is centralized in `src/config.ts`; use `requireEnv()` for mandatory vars.
+- Admin routes use `app.verifyFirebaseToken` as a preHandler hook.
+- Multipart uploads use `request.parts()` iterator from `@fastify/multipart`.
+
+### Frontend
+
+- Page data comes from `+page.server.ts` load functions (SSR).
+- Admin pages use client-side fetches with auth tokens (no server load).
+- The API client in `$lib/api.ts` is the single interface to the backend.
+- Svelte stores in `$lib/stores/` for shared state (auth, cart).
+- Components in `$lib/components/`.
+
+### Style
+
+- Prettier with svelte plugin. Config in `.prettierrc`.
+- ESLint with typescript-eslint and svelte plugin. Config in `eslint.config.js`.
+- Single quotes, trailing commas, 100 char line width.
+- No `any` unless unavoidable (warned, not errored).
+
+### Git
+
+- Commit messages: short imperative title, blank line, bulleted details.
+- Do not commit `.env`, `images/`, `node_modules/`, or build output.
+- Do not commit planning artifacts from `docs/superpowers/` or `.superpowers/`.
+
+### Testing
+
+- Backend: integration tests using `fastify.inject()` against real Postgres. Test helper in `tests/helper.ts`.
+- Frontend: unit tests for store logic. Uses vitest with SvelteKit vite plugin.
+- Test meaningful behavior, not implementation details.
+
+## File Layout Reference
+
+```
+backend/src/
+├── config.ts              # Env var loading
+├── index.ts               # Server entry point
+├── plugins/
+│   ├── db.ts              # Knex connection + auto-migrate
+│   └── firebase.ts        # Firebase Admin + token verification
+├── routes/
+│   ├── admin.ts           # POST/PUT/DELETE products (authed)
+│   ├── health.ts          # GET /api/health
+│   └── products.ts        # GET products (public)
+├── schemas/
+│   └── product.ts         # JSON schemas for validation
+└── migrations/
+    └── 001_create_products.ts
+
+frontend/src/
+├── lib/
+│   ├── api.ts             # Backend API client
+│   ├── firebase.ts        # Firebase client init
+│   ├── stores/
+│   │   ├── auth.ts        # Firebase auth state
+│   │   └── cart.ts        # Cart with localStorage
+│   └── components/
+│       ├── ProductCard.svelte
+│       └── CartItem.svelte
+└── routes/
+    ├── +layout.server.ts  # Runtime env config
+    ├── +layout.svelte     # Nav with cart count
+    ├── +page.svelte       # Product listing
+    ├── products/[id]/     # Product detail
+    ├── cart/              # Cart page
+    └── admin/             # Auth guard, CRUD, login
+```
