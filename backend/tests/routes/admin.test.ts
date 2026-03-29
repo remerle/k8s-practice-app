@@ -1,0 +1,138 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import Fastify from 'fastify';
+import Knex from 'knex';
+import fp from 'fastify-plugin';
+import multipart from '@fastify/multipart';
+import adminRoutes from '../../src/routes/admin.js';
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
+
+const TEST_DB_URL = process.env.DATABASE_URL ?? 'postgres://shop:shop@localhost:5432/shop';
+
+async function buildAdminApp() {
+  const app = Fastify({ logger: false });
+  const knex = Knex.default({ client: 'pg', connection: TEST_DB_URL });
+
+  const imageDir = fs.mkdtempSync(path.join(os.tmpdir(), 'test-images-'));
+
+  const dbPlugin = fp(async (instance) => {
+    instance.decorate('knex', knex);
+    instance.addHook('onClose', async () => { await knex.destroy(); });
+  }, { name: 'db' });
+
+  const fakeAuth = fp(async (instance) => {
+    instance.decorate('verifyFirebaseToken', async () => {
+      // no-op in tests: all requests are authorized
+    });
+  }, { name: 'firebase' });
+
+  await app.register(multipart, { limits: { fileSize: 5 * 1024 * 1024 } });
+  await app.register(dbPlugin);
+  await app.register(fakeAuth);
+  await app.register(adminRoutes);
+
+  // Override image storage path
+  (app as any).imageStoragePath = imageDir;
+
+  await knex('products').del();
+
+  return { app, knex, imageDir };
+}
+
+describe('POST /api/products', () => {
+  let app: Awaited<ReturnType<typeof Fastify>>;
+  let knex: Knex.Knex;
+  let imageDir: string;
+
+  beforeEach(async () => {
+    const built = await buildAdminApp();
+    app = built.app;
+    knex = built.knex;
+    imageDir = built.imageDir;
+  });
+
+  afterEach(async () => {
+    await app.close();
+    fs.rmSync(imageDir, { recursive: true, force: true });
+  });
+
+  it('creates a product without an image', async () => {
+    const form = new FormData();
+    form.append('name', 'Test Product');
+    form.append('sku', 'TST-001');
+    form.append('price', '29.99');
+    form.append('description', 'A test product');
+
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/products',
+      payload: form,
+      headers: { authorization: 'Bearer fake-token' },
+    });
+
+    expect(res.statusCode).toBe(201);
+    const body = res.json();
+    expect(body).toHaveProperty('name', 'Test Product');
+    expect(body).toHaveProperty('sku', 'TST-001');
+    expect(body).toHaveProperty('price', '29.99');
+  });
+
+  it('returns 400 when required fields are missing', async () => {
+    const form = new FormData();
+    form.append('name', 'Incomplete');
+
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/products',
+      payload: form,
+      headers: { authorization: 'Bearer fake-token' },
+    });
+
+    expect(res.statusCode).toBe(400);
+  });
+});
+
+describe('DELETE /api/products/:id', () => {
+  let app: Awaited<ReturnType<typeof Fastify>>;
+  let knex: Knex.Knex;
+  let imageDir: string;
+
+  beforeEach(async () => {
+    const built = await buildAdminApp();
+    app = built.app;
+    knex = built.knex;
+    imageDir = built.imageDir;
+  });
+
+  afterEach(async () => {
+    await app.close();
+    fs.rmSync(imageDir, { recursive: true, force: true });
+  });
+
+  it('deletes a product', async () => {
+    const [product] = await knex('products')
+      .insert({ name: 'Delete Me', sku: 'DEL-001', price: 5.00 })
+      .returning('*');
+
+    const res = await app.inject({
+      method: 'DELETE',
+      url: `/api/products/${product.id}`,
+      headers: { authorization: 'Bearer fake-token' },
+    });
+
+    expect(res.statusCode).toBe(200);
+    const remaining = await knex('products').where({ id: product.id });
+    expect(remaining).toHaveLength(0);
+  });
+
+  it('returns 404 for non-existent product', async () => {
+    const res = await app.inject({
+      method: 'DELETE',
+      url: '/api/products/99999',
+      headers: { authorization: 'Bearer fake-token' },
+    });
+
+    expect(res.statusCode).toBe(404);
+  });
+});
