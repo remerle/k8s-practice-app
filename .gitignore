@@ -36,6 +36,9 @@ images/
 *.pid
 *.seed
 
+# Claude Code
+.claude/
+
 # Superpowers (local planning artifacts)
 .superpowers/
 docs/superpowers/
