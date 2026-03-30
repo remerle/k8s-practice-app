@@ -53,7 +53,9 @@ const adminRoutes: FastifyPluginAsync<AdminRoutesOptions> = async (app, opts) =>
 
     if (!PRICE_PATTERN.test(fields.price)) {
       reply.status(400);
-      return { error: 'Invalid price format: must be a positive number with up to 2 decimal places' };
+      return {
+        error: 'Invalid price format: must be a positive number with up to 2 decimal places',
+      };
     }
 
     const [product] = await app
@@ -116,7 +118,9 @@ const adminRoutes: FastifyPluginAsync<AdminRoutesOptions> = async (app, opts) =>
 
     if (fields.price && !PRICE_PATTERN.test(fields.price)) {
       reply.status(400);
-      return { error: 'Invalid price format: must be a positive number with up to 2 decimal places' };
+      return {
+        error: 'Invalid price format: must be a positive number with up to 2 decimal places',
+      };
     }
 
     const updates: Record<string, unknown> = { updated_at: app.knex.fn.now() };

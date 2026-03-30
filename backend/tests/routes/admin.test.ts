@@ -180,7 +180,11 @@ describe('POST /api/products', () => {
     form.append('name', 'XSS Product');
     form.append('sku', 'XSS-001');
     form.append('price', '9.99');
-    form.append('image', new Blob(['<script>alert(1)</script>'], { type: 'text/html' }), 'evil.html');
+    form.append(
+      'image',
+      new Blob(['<script>alert(1)</script>'], { type: 'text/html' }),
+      'evil.html',
+    );
 
     const res = await app.inject({
       method: 'POST',
