@@ -41,9 +41,7 @@ async function buildRejectingAuthApp() {
   await app.register(multipart, { limits: { fileSize: 5 * 1024 * 1024 } });
   await app.register(dbPlugin);
   await app.register(rejectingAuth);
-  await app.register(adminRoutes);
-
-  (app as any).imageStoragePath = imageDir;
+  await app.register(adminRoutes, { imageStoragePath: imageDir });
 
   await knex('products').del();
 
@@ -78,10 +76,7 @@ async function buildAdminApp() {
   await app.register(multipart, { limits: { fileSize: 5 * 1024 * 1024 } });
   await app.register(dbPlugin);
   await app.register(fakeAuth);
-  await app.register(adminRoutes);
-
-  // Override image storage path
-  (app as any).imageStoragePath = imageDir;
+  await app.register(adminRoutes, { imageStoragePath: imageDir });
 
   await knex('products').del();
 

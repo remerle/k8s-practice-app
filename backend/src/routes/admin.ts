@@ -14,10 +14,14 @@ function parseProductId(idParam: string): number | null {
 const ALLOWED_IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp']);
 const PRICE_PATTERN = /^\d+\.?\d{0,2}$/;
 
-const adminRoutes: FastifyPluginAsync = async (app) => {
+interface AdminRoutesOptions {
+  imageStoragePath?: string;
+}
+
+const adminRoutes: FastifyPluginAsync<AdminRoutesOptions> = async (app, opts) => {
   app.addHook('preHandler', app.verifyFirebaseToken);
 
-  const imageDir = (app as any).imageStoragePath ?? path.resolve(config.imageStoragePath);
+  const imageDir = opts.imageStoragePath ?? path.resolve(config.imageStoragePath);
 
   fs.mkdirSync(imageDir, { recursive: true });
 
