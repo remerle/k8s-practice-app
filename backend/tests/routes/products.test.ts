@@ -26,6 +26,34 @@ describe('GET /api/products', () => {
     expect(products[0]).toHaveProperty('name', 'Widget');
     expect(products[1]).toHaveProperty('name', 'Gadget');
   });
+
+  it('paginates results with limit and offset', async () => {
+    await seedProducts(app);
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/products?limit=1&offset=0',
+    });
+    expect(res.statusCode).toBe(200);
+    const products = res.json();
+    expect(products).toHaveLength(1);
+  });
+
+  it('defaults to 50 items when no limit specified', async () => {
+    await seedProducts(app);
+    const res = await app.inject({ method: 'GET', url: '/api/products' });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toHaveLength(2);
+  });
+
+  it('caps limit at 100', async () => {
+    await seedProducts(app);
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/products?limit=999',
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toHaveLength(2);
+  });
 });
 
 describe('GET /api/products/:id', () => {
