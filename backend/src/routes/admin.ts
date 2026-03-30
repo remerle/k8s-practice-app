@@ -101,7 +101,11 @@ const adminRoutes: FastifyPluginAsync<AdminRoutesOptions> = async (app, opts) =>
 
         if (existing.image_location) {
           const oldPath = path.join(imageDir, existing.image_location);
-          fs.unlink(oldPath, () => {});
+          fs.unlink(oldPath, (err) => {
+            if (err && err.code !== 'ENOENT') {
+              app.log.warn({ err, path: oldPath }, 'Failed to delete old product image');
+            }
+          });
         }
 
         imageLocation = filename;
@@ -142,7 +146,11 @@ const adminRoutes: FastifyPluginAsync<AdminRoutesOptions> = async (app, opts) =>
 
     if (product.image_location) {
       const imagePath = path.join(imageDir, product.image_location);
-      fs.unlink(imagePath, () => {});
+      fs.unlink(imagePath, (err) => {
+        if (err && err.code !== 'ENOENT') {
+          app.log.warn({ err, path: imagePath }, 'Failed to delete product image');
+        }
+      });
     }
 
     await app.knex('products').where({ id }).del();
