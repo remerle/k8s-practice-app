@@ -31,8 +31,7 @@ async function buildRejectingAuthApp() {
       instance.decorate(
         'verifyFirebaseToken',
         async (_request: FastifyRequest, reply: FastifyReply) => {
-          reply.status(401).send({ error: 'Invalid or expired token' });
-          return;
+          return reply.status(401).send({ error: 'Invalid or expired token' });
         },
       );
     },
