@@ -5,6 +5,12 @@ import path from 'node:path';
 import { pipeline } from 'node:stream/promises';
 import { config } from '../config.js';
 
+function parseProductId(idParam: string): number | null {
+  const id = Number(idParam);
+  if (!Number.isInteger(id) || id <= 0) return null;
+  return id;
+}
+
 const ALLOWED_IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp']);
 const PRICE_PATTERN = /^\d+\.?\d{0,2}$/;
 
@@ -62,7 +68,12 @@ const adminRoutes: FastifyPluginAsync = async (app) => {
   });
 
   app.put<{ Params: { id: string } }>('/api/products/:id', async (request, reply) => {
-    const { id } = request.params;
+    const id = parseProductId(request.params.id);
+    if (id === null) {
+      reply.status(400);
+      return { error: 'Invalid product ID' };
+    }
+
     const existing = await app.knex('products').where({ id }).first();
     if (!existing) {
       reply.status(404);
@@ -113,7 +124,12 @@ const adminRoutes: FastifyPluginAsync = async (app) => {
   });
 
   app.delete<{ Params: { id: string } }>('/api/products/:id', async (request, reply) => {
-    const { id } = request.params;
+    const id = parseProductId(request.params.id);
+    if (id === null) {
+      reply.status(400);
+      return { error: 'Invalid product ID' };
+    }
+
     const product = await app.knex('products').where({ id }).first();
     if (!product) {
       reply.status(404);

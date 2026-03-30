@@ -1,5 +1,11 @@
 import { FastifyPluginAsync } from 'fastify';
 
+function parseProductId(idParam: string): number | null {
+  const id = Number(idParam);
+  if (!Number.isInteger(id) || id <= 0) return null;
+  return id;
+}
+
 const productRoutes: FastifyPluginAsync = async (app) => {
   app.get<{ Querystring: { limit?: string; offset?: string } }>(
     '/api/products',
@@ -17,7 +23,12 @@ const productRoutes: FastifyPluginAsync = async (app) => {
   );
 
   app.get<{ Params: { id: string } }>('/api/products/:id', async (request, reply) => {
-    const { id } = request.params;
+    const id = parseProductId(request.params.id);
+    if (id === null) {
+      reply.status(400);
+      return { error: 'Invalid product ID' };
+    }
+
     const product = await app.knex('products').where({ id }).first();
     if (!product) {
       reply.status(404);

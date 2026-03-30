@@ -80,4 +80,10 @@ describe('GET /api/products/:id', () => {
     const res = await app.inject({ method: 'GET', url: '/api/products/99999' });
     expect(res.statusCode).toBe(404);
   });
+
+  it('returns 400 for non-numeric id', async () => {
+    const res = await app.inject({ method: 'GET', url: '/api/products/abc' });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error).toMatch(/invalid/i);
+  });
 });

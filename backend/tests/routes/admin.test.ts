@@ -307,4 +307,14 @@ describe('DELETE /api/products/:id', () => {
 
     expect(res.statusCode).toBe(404);
   });
+
+  it('returns 400 for non-numeric id', async () => {
+    const res = await app.inject({
+      method: 'DELETE',
+      url: '/api/products/abc',
+      headers: { authorization: 'Bearer fake-token' },
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error).toMatch(/invalid/i);
+  });
 });
