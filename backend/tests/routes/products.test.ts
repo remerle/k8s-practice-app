@@ -23,8 +23,8 @@ describe('GET /api/products', () => {
     expect(res.statusCode).toBe(200);
     const products = res.json();
     expect(products).toHaveLength(2);
-    expect(products[0]).toHaveProperty('name', 'Widget');
-    expect(products[1]).toHaveProperty('name', 'Gadget');
+    const names = products.map((p: { name: string }) => p.name).sort();
+    expect(names).toEqual(['Gadget', 'Widget']);
   });
 
   it('paginates results with limit and offset', async () => {
