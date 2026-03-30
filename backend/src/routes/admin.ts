@@ -5,6 +5,8 @@ import path from 'node:path';
 import { pipeline } from 'node:stream/promises';
 import { config } from '../config.js';
 
+const ALLOWED_IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp']);
+
 const adminRoutes: FastifyPluginAsync = async (app) => {
   app.addHook('preHandler', app.verifyFirebaseToken);
 
@@ -19,7 +21,11 @@ const adminRoutes: FastifyPluginAsync = async (app) => {
     const parts = request.parts();
     for await (const part of parts) {
       if (part.type === 'file') {
-        const ext = path.extname(part.filename);
+        const ext = path.extname(part.filename).toLowerCase();
+        if (!ALLOWED_IMAGE_EXTENSIONS.has(ext)) {
+          reply.status(400);
+          return { error: `Unsupported file type: ${ext}` };
+        }
         const filename = `${randomUUID()}${ext}`;
         const filepath = path.join(imageDir, filename);
         await pipeline(part.file, fs.createWriteStream(filepath));
@@ -63,7 +69,11 @@ const adminRoutes: FastifyPluginAsync = async (app) => {
     const parts = request.parts();
     for await (const part of parts) {
       if (part.type === 'file') {
-        const ext = path.extname(part.filename);
+        const ext = path.extname(part.filename).toLowerCase();
+        if (!ALLOWED_IMAGE_EXTENSIONS.has(ext)) {
+          reply.status(400);
+          return { error: `Unsupported file type: ${ext}` };
+        }
         const filename = `${randomUUID()}${ext}`;
         const filepath = path.join(imageDir, filename);
         await pipeline(part.file, fs.createWriteStream(filepath));
