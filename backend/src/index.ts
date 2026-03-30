@@ -12,7 +12,10 @@ import adminRoutes from './routes/admin.js';
 
 const app = Fastify({ logger: true });
 
-await app.register(cors);
+await app.register(cors, {
+  origin: config.corsOrigin,
+  credentials: true,
+});
 await app.register(multipart, { limits: { fileSize: 5 * 1024 * 1024 } });
 await app.register(fastifyStatic, {
   root: path.resolve(config.imageStoragePath),

@@ -5,6 +5,7 @@ interface Config {
   imageStoragePath: string;
   port: number;
   firebaseProjectId: string;
+  corsOrigin: string;
 }
 
 function requireEnv(name: string): string {
@@ -20,4 +21,5 @@ export const config: Config = {
   imageStoragePath: process.env.IMAGE_STORAGE_PATH ?? './images',
   port: parseInt(process.env.PORT ?? '3000', 10),
   firebaseProjectId: requireEnv('FIREBASE_PROJECT_ID'),
+  corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
 };
