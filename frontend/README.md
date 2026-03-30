@@ -1,4 +1,4 @@
-# sv
+# Frontend
 
 Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
 
@@ -39,4 +39,4 @@ npm run build
 
 You can preview the production build with `npm run preview`.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+> This project uses `@sveltejs/adapter-node` for deployment. See the [SvelteKit adapters documentation](https://svelte.dev/docs/kit/adapters) for alternatives.

@@ -19,7 +19,7 @@ just dev           # Run frontend + backend concurrently
 just format        # Prettier (includes Svelte files)
 just lint          # ESLint
 just test          # Run all tests
-just validate      # Full check: format, lint, typecheck, tests
+just validate      # Full check: format check, lint, frontend typecheck, tests
 just migrate       # Run Knex migrations (requires Postgres)
 ```
 
@@ -44,6 +44,23 @@ Key points for agents:
 - **Auth is admin-only**: Firebase Google auth protects `/admin` routes. The storefront is fully public. Cart lives in localStorage.
 - **Image storage on disk**: Backend writes to and serves from a configurable directory. The path is set via `IMAGE_STORAGE_PATH`.
 - **Auto-migration**: The Knex db plugin runs `migrate.latest()` on startup. Migrations must be additive (no column drops or renames).
+
+## Database Schema
+
+Single table, auto-migrated on startup via `001_create_products.ts`:
+
+| Column           | Type          | Constraints       |
+| ---------------- | ------------- | ----------------- |
+| `id`             | integer       | auto-increment PK |
+| `name`           | varchar(255)  | not null          |
+| `description`    | text          | nullable          |
+| `sku`            | varchar(100)  | unique, not null  |
+| `price`          | decimal(10,2) | not null          |
+| `image_location` | varchar(500)  | nullable          |
+| `created_at`     | timestamptz   | default now()     |
+| `updated_at`     | timestamptz   | default now()     |
+
+Key constraints: `sku` must be unique (duplicate inserts will fail at the DB level), `price` stores two decimal places.
 
 ## Conventions
 

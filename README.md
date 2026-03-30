@@ -34,22 +34,27 @@ Frontend runs on `http://localhost:5173`, backend on `http://localhost:3000`.
 
 ## Available Commands
 
-| Command | Description |
-|---------|-------------|
-| `just install` | Install all dependencies |
-| `just setup` | First-time setup (install + DB + migrations) |
-| `just dev` | Run both frontend and backend |
-| `just dev-frontend` | Run frontend only |
-| `just dev-backend` | Run backend only |
-| `just db-up` | Start local Postgres |
-| `just db-down` | Stop local Postgres |
-| `just migrate` | Run database migrations |
-| `just format` | Format all code with Prettier |
-| `just lint` | Lint all code with ESLint |
-| `just test` | Run all tests |
-| `just build` | Build both packages |
-| `just validate` | Full validation (format + lint + typecheck + tests) |
-| `just docker-build` | Build Docker images locally |
+| Command               | Description                                                 |
+| --------------------- | ----------------------------------------------------------- |
+| `just install`        | Install all dependencies                                    |
+| `just setup`          | First-time setup (install + DB + migrations)                |
+| `just dev`            | Run both frontend and backend                               |
+| `just dev-frontend`   | Run frontend only                                           |
+| `just dev-backend`    | Run backend only                                            |
+| `just db-up`          | Start local Postgres                                        |
+| `just db-down`        | Stop local Postgres                                         |
+| `just migrate`        | Run database migrations                                     |
+| `just format`         | Format all code with Prettier                               |
+| `just format-check`   | Check formatting without writing                            |
+| `just lint`           | Lint all code with ESLint                                   |
+| `just lint-fix`       | Lint and auto-fix fixable issues                            |
+| `just test`           | Run all tests (requires a `test` script in both workspaces) |
+| `just test-backend`   | Run backend tests only (requires Postgres)                  |
+| `just test-frontend`  | Run frontend tests only                                     |
+| `just check-frontend` | Type-check the frontend                                     |
+| `just build`          | Build both packages                                         |
+| `just validate`       | Full validation (format check + lint + typecheck + tests)   |
+| `just docker-build`   | Build Docker images locally                                 |
 
 ## Configuration
 
@@ -61,27 +66,29 @@ cp .env.example .env
 
 ### Backend
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `DATABASE_URL` | Yes | - | PostgreSQL connection string (e.g. `postgres://user:pass@host:5432/dbname`) |
-| `FIREBASE_PROJECT_ID` | Yes | - | Firebase project ID for admin token verification |
-| `PORT` | No | `3000` | Port the backend listens on |
-| `IMAGE_STORAGE_PATH` | No | `./images` | Directory for uploaded product images |
+| Variable              | Required | Default    | Description                                                                            |
+| --------------------- | -------- | ---------- | -------------------------------------------------------------------------------------- |
+| `DATABASE_URL`        | Yes      | -          | PostgreSQL connection string (e.g. `postgres://user:pass@host:5432/dbname`)            |
+| `FIREBASE_PROJECT_ID` | Yes      | -          | Firebase project ID for admin token verification                                       |
+| `PORT`                | No       | `3000`     | Port the backend listens on                                                            |
+| `IMAGE_STORAGE_PATH`  | No       | `./images` | Directory for uploaded product images (defaults to `/data/images` in the Docker image) |
 
 The backend binds to `0.0.0.0` on the configured port.
 
 ### Frontend
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `API_URL` | No | `http://localhost:3000` | Backend API base URL (used for both SSR and client-side requests) |
-| `FIREBASE_API_KEY` | Yes | - | Firebase client API key |
-| `FIREBASE_AUTH_DOMAIN` | Yes | - | Firebase auth domain |
-| `FIREBASE_PROJECT_ID` | Yes | - | Firebase project ID |
-| `FIREBASE_STORAGE_BUCKET` | Yes | - | Firebase storage bucket |
-| `FIREBASE_MESSAGING_SENDER_ID` | Yes | - | Firebase messaging sender ID |
-| `FIREBASE_APP_ID` | Yes | - | Firebase app ID |
-| `PORT` | No | `3000` | Port the frontend listens on (adapter-node) |
+| Variable                       | Required | Default                 | Description                                                       |
+| ------------------------------ | -------- | ----------------------- | ----------------------------------------------------------------- |
+| `API_URL`                      | No       | `http://localhost:3000` | Backend API base URL (used for both SSR and client-side requests) |
+| `FIREBASE_API_KEY`             | No\*     | `''`                    | Firebase client API key                                           |
+| `FIREBASE_AUTH_DOMAIN`         | No\*     | `''`                    | Firebase auth domain                                              |
+| `FIREBASE_PROJECT_ID`          | No\*     | `''`                    | Firebase project ID                                               |
+| `FIREBASE_STORAGE_BUCKET`      | No\*     | `''`                    | Firebase storage bucket                                           |
+| `FIREBASE_MESSAGING_SENDER_ID` | No\*     | `''`                    | Firebase messaging sender ID                                      |
+| `FIREBASE_APP_ID`              | No\*     | `''`                    | Firebase app ID                                                   |
+| `PORT`                         | No       | `3000`                  | Port the frontend listens on (adapter-node)                       |
+
+\* Required for admin authentication to work. The app starts without them, but Firebase auth (Google sign-in for admin) will not function.
 
 The frontend reads all environment variables at **runtime** (not build time) via SvelteKit's `$env/dynamic/private` in the root layout server load function, then passes them to the client as page data.
 
@@ -121,8 +128,37 @@ application/
 ### Admin (requires Firebase auth token)
 
 - `POST /api/products` - Create product (multipart with image)
-- `PUT /api/products/:id` - Update product
+- `PUT /api/products/:id` - Update product (multipart with image)
 - `DELETE /api/products/:id` - Delete product
+
+### Product Schema
+
+Products have the following fields:
+
+| Field            | Type    | Required on Create | Constraints                                                 |
+| ---------------- | ------- | ------------------ | ----------------------------------------------------------- |
+| `id`             | integer | (auto)             | Auto-increment primary key                                  |
+| `name`           | string  | Yes                | Max 255 characters                                          |
+| `description`    | string  | No                 | Free text, nullable                                         |
+| `sku`            | string  | Yes                | Max 100 characters, must be unique                          |
+| `price`          | string  | Yes                | Decimal format, e.g. `"29.99"` (pattern: `^\d+\.?\d{0,2}$`) |
+| `image_location` | string  | No                 | Filename of uploaded image, nullable                        |
+| `created_at`     | string  | (auto)             | ISO timestamp                                               |
+| `updated_at`     | string  | (auto)             | ISO timestamp                                               |
+
+### Multipart Upload Format
+
+`POST /api/products` and `PUT /api/products/:id` accept `multipart/form-data` with the following fields:
+
+| Field         | Type | Required     | Description                 |
+| ------------- | ---- | ------------ | --------------------------- |
+| `name`        | text | Yes (create) | Product name                |
+| `description` | text | No           | Product description         |
+| `sku`         | text | Yes (create) | Stock keeping unit (unique) |
+| `price`       | text | Yes (create) | Price as a decimal string   |
+| image         | file | No           | Product image (max 5 MB)    |
+
+On update (`PUT`), all fields are optional; only provided fields are changed.
 
 ## Docker Images
 
