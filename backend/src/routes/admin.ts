@@ -51,7 +51,7 @@ const adminRoutes: FastifyPluginAsync<AdminRoutesOptions> = async (app, opts) =>
       return { error: 'Missing required fields: name, sku, price' };
     }
 
-    if (!PRICE_PATTERN.test(fields.price)) {
+    if (!PRICE_PATTERN.test(fields.price) || parseFloat(fields.price) <= 0) {
       reply.status(400);
       return {
         error: 'Invalid price format: must be a positive number with up to 2 decimal places',

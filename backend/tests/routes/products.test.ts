@@ -69,11 +69,12 @@ describe('GET /api/products/:id', () => {
   it('returns a single product by id', async () => {
     await seedProducts(app);
     const all = await app.inject({ method: 'GET', url: '/api/products' });
-    const id = all.json()[0].id;
+    const first = all.json()[0];
 
-    const res = await app.inject({ method: 'GET', url: `/api/products/${id}` });
+    const res = await app.inject({ method: 'GET', url: `/api/products/${first.id}` });
     expect(res.statusCode).toBe(200);
-    expect(res.json()).toHaveProperty('name', 'Widget');
+    expect(res.json()).toHaveProperty('id', first.id);
+    expect(res.json()).toHaveProperty('name', first.name);
   });
 
   it('returns 404 for non-existent product', async () => {
