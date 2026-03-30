@@ -17,15 +17,14 @@ const firebasePlugin: FastifyPluginAsync = async (app) => {
   app.decorate('verifyFirebaseToken', async (request: FastifyRequest, reply: FastifyReply) => {
     const authHeader = request.headers.authorization;
     if (!authHeader?.startsWith('Bearer ')) {
-      reply.status(401).send({ error: 'Missing or invalid authorization header' });
-      return;
+      return reply.status(401).send({ error: 'Missing or invalid authorization header' });
     }
 
     const token = authHeader.slice(7);
     try {
       await admin.auth().verifyIdToken(token);
     } catch (_err) {
-      reply.status(401).send({ error: 'Invalid or expired token' });
+      return reply.status(401).send({ error: 'Invalid or expired token' });
     }
   });
 };
