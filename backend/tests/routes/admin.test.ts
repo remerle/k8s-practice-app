@@ -216,6 +216,40 @@ describe('POST /api/products', () => {
     expect(res.json()).toHaveProperty('image_location');
   });
 
+  it('rejects invalid price format', async () => {
+    const form = new FormData();
+    form.append('name', 'Bad Price');
+    form.append('sku', 'BP-001');
+    form.append('price', 'abc');
+
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/products',
+      payload: form,
+      headers: { authorization: 'Bearer fake-token' },
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error).toMatch(/price/i);
+  });
+
+  it('rejects negative price', async () => {
+    const form = new FormData();
+    form.append('name', 'Negative Price');
+    form.append('sku', 'NP-001');
+    form.append('price', '-5.00');
+
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/products',
+      payload: form,
+      headers: { authorization: 'Bearer fake-token' },
+    });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error).toMatch(/price/i);
+  });
+
   it('returns 400 when required fields are missing', async () => {
     const form = new FormData();
     form.append('name', 'Incomplete');

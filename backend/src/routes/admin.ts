@@ -6,6 +6,7 @@ import { pipeline } from 'node:stream/promises';
 import { config } from '../config.js';
 
 const ALLOWED_IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.gif', '.webp']);
+const PRICE_PATTERN = /^\d+\.?\d{0,2}$/;
 
 const adminRoutes: FastifyPluginAsync = async (app) => {
   app.addHook('preHandler', app.verifyFirebaseToken);
@@ -38,6 +39,11 @@ const adminRoutes: FastifyPluginAsync = async (app) => {
     if (!fields.name || !fields.sku || !fields.price) {
       reply.status(400);
       return { error: 'Missing required fields: name, sku, price' };
+    }
+
+    if (!PRICE_PATTERN.test(fields.price)) {
+      reply.status(400);
+      return { error: 'Invalid price format: must be a positive number with up to 2 decimal places' };
     }
 
     const [product] = await app
@@ -87,6 +93,11 @@ const adminRoutes: FastifyPluginAsync = async (app) => {
       } else {
         fields[part.fieldname] = part.value as string;
       }
+    }
+
+    if (fields.price && !PRICE_PATTERN.test(fields.price)) {
+      reply.status(400);
+      return { error: 'Invalid price format: must be a positive number with up to 2 decimal places' };
     }
 
     const updates: Record<string, unknown> = { updated_at: app.knex.fn.now() };
