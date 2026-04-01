@@ -80,7 +80,7 @@
 
     {#if loading}
       <div class="px-6 pb-6 space-y-4">
-        {#each [1, 2, 3] as _}
+        {#each [1, 2, 3] as i (i)}
           <div class="flex items-center gap-4">
             <div class="skeleton w-12 h-12 rounded"></div>
             <div class="flex-1 space-y-2">
