@@ -13,9 +13,7 @@
       K8s Shop
     </a>
   </div>
-  <div class="navbar-center hidden sm:flex">
-    <a href="/" class="btn btn-ghost btn-sm">Products</a>
-  </div>
+  <div class="navbar-center hidden sm:flex"></div>
   <div class="navbar-end flex items-center gap-1">
     <a href="/cart" class="btn btn-ghost btn-circle" title="Cart">
       <div class="indicator">
