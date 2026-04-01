@@ -60,22 +60,22 @@
     {/if}
 
     <form onsubmit={handleSubmit} class="space-y-4">
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Name</legend>
-        <input type="text" class="input w-full" bind:value={name} required />
-      </fieldset>
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">SKU</legend>
-        <input type="text" class="input w-full" bind:value={sku} required />
-      </fieldset>
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Price</legend>
-        <input type="number" step="0.01" min="0" class="input w-full" bind:value={price} required />
-      </fieldset>
-      <fieldset class="fieldset">
-        <legend class="fieldset-legend">Description</legend>
-        <textarea class="textarea w-full" rows="4" bind:value={description}></textarea>
-      </fieldset>
+      <label class="floating-label w-full">
+        <span>Name</span>
+        <input type="text" placeholder="Name" class="input input-md w-full" bind:value={name} required />
+      </label>
+      <label class="floating-label w-full">
+        <span>SKU</span>
+        <input type="text" placeholder="SKU" class="input input-md w-full" bind:value={sku} required />
+      </label>
+      <label class="floating-label w-full">
+        <span>Price</span>
+        <input type="number" step="0.01" min="0" placeholder="Price" class="input input-md w-full" bind:value={price} required />
+      </label>
+      <label class="floating-label w-full">
+        <span>Description</span>
+        <textarea placeholder="Description" class="textarea textarea-bordered w-full" rows="4" bind:value={description}></textarea>
+      </label>
       <fieldset class="fieldset">
         <legend class="fieldset-legend">Image</legend>
         <input type="file" accept="image/*" class="file-input file-input-bordered w-full" onchange={handleFileChange} />
