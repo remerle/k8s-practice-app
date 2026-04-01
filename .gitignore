@@ -1,5 +1,8 @@
 # Dependencies
 node_modules/
+# Workspace packages must not have their own lockfiles; the root lockfile is authoritative
+frontend/package-lock.json
+backend/package-lock.json
 
 # Build output
 dist/

@@ -46,6 +46,7 @@ Key points for agents:
 - **Auth is admin-only**: Firebase Google auth protects `/admin` routes. The storefront is fully public. Cart lives in localStorage.
 - **Image storage on disk**: Backend writes to and serves from a configurable directory. The path is set via `IMAGE_STORAGE_PATH`.
 - **Auto-migration**: The Knex db plugin runs `migrate.latest()` on startup. Migrations must be additive (no column drops or renames).
+- **Docker builds use `npm install`, not `npm ci`**: npm's lockfile (v3) only records platform-specific optional deps for the OS/arch where it was generated. Since the lockfile is generated on macOS but Docker builds run on linux, `npm ci` fails on native binaries (rollup, lightningcss, etc.). Each Dockerfile copies only its `package.json` and runs `npm install`. The root lockfile pins versions for local dev. Ideally, migrate to pnpm which handles cross-platform lockfiles correctly.
 
 ## Database Schema
 

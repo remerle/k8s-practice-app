@@ -2,8 +2,10 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json ./
+# npm install (not ci): the workspace root lockfile doesn't include linux native
+# binaries when generated on macOS. Migrate to pnpm to fix this properly.
+RUN npm install
 
 COPY tsconfig.json ./
 COPY src/ ./src/
@@ -14,8 +16,8 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
+COPY package.json ./
+RUN npm install --omit=dev
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/src/migrations ./src/migrations
