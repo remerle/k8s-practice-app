@@ -1,9 +1,8 @@
 import { fetchProducts } from '$lib/api';
-import { env } from '$env/dynamic/private';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async () => {
-  const apiUrl = env.API_URL ?? 'http://localhost:3000';
+export const load: PageServerLoad = async ({ parent }) => {
+  const { apiUrl } = await parent();
   const products = await fetchProducts(apiUrl);
   return { products };
 };

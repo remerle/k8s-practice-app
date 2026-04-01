@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { formatPrice } from '$lib/api';
   import { cart } from '$lib/stores/cart';
 
   let { data } = $props();
@@ -12,7 +13,7 @@
     cart.addItem({
       productId: product.id,
       name: product.name,
-      price: parseFloat(product.price),
+      price: product.price,
       imageLocation: product.image_location,
     });
     added = true;
@@ -39,7 +40,7 @@
   <div class="product-info">
     <h1>{product.name}</h1>
     <p class="sku">SKU: {product.sku}</p>
-    <p class="price">${parseFloat(product.price).toFixed(2)}</p>
+    <p class="price">{formatPrice(product.price)}</p>
     {#if product.description}
       <p class="description">{product.description}</p>
     {/if}

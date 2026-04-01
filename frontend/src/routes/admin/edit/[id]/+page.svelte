@@ -6,7 +6,7 @@
   import { getIdToken } from '$lib/stores/auth';
 
   const apiUrl = $derived($page.data.apiUrl);
-  const productId = $derived(parseInt($page.params.id, 10));
+  const productId = $derived(parseInt($page.params.id ?? '', 10));
 
   let name = $state('');
   let sku = $state('');
@@ -23,7 +23,7 @@
       const product = await fetchProduct(apiUrl, productId);
       name = product.name;
       sku = product.sku;
-      price = product.price;
+      price = String(product.price);
       description = product.description ?? '';
       currentImage = product.image_location;
     } catch (err) {
@@ -109,7 +109,7 @@
         {/if}
       </div>
       <div class="form-actions">
-        <a href="/admin" class="btn-secondary" style="text-decoration:none">Cancel</a>
+        <a href="/admin" class="btn-secondary btn-link">Cancel</a>
         <button type="submit" class="btn-primary" disabled={saving}>
           {saving ? 'Saving...' : 'Update Product'}
         </button>
@@ -184,5 +184,9 @@
   .error {
     color: var(--color-danger);
     margin-bottom: 1rem;
+  }
+
+  .btn-link {
+    text-decoration: none;
   }
 </style>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Product } from '$lib/api';
+  import { formatPrice, type Product } from '$lib/api';
 
   let { product, apiUrl }: { product: Product; apiUrl: string } = $props();
 </script>
@@ -14,7 +14,7 @@
   </div>
   <div class="card-body">
     <h3>{product.name}</h3>
-    <p class="price">${parseFloat(product.price).toFixed(2)}</p>
+    <p class="price">{formatPrice(product.price)}</p>
   </div>
 </a>
 

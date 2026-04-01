@@ -4,7 +4,17 @@ declare global {
   namespace App {
     // interface Error {}
     // interface Locals {}
-    // interface PageData {}
+    interface PageData {
+      apiUrl: string;
+      firebase: {
+        apiKey: string;
+        authDomain: string;
+        projectId: string;
+        storageBucket: string;
+        messagingSenderId: string;
+        appId: string;
+      };
+    }
     // interface PageState {}
     // interface Platform {}
   }

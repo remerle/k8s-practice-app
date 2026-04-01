@@ -3,7 +3,7 @@
  * The apiUrl is passed from the layout server load function.
  */
 
-export interface Product {
+interface RawProduct {
   id: number;
   name: string;
   description: string | null;
@@ -14,12 +14,33 @@ export interface Product {
   updated_at: string;
 }
 
+export interface Product {
+  id: number;
+  name: string;
+  description: string | null;
+  sku: string;
+  price: number;
+  image_location: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Formats a numeric price as a dollar string with two decimal places. */
+export function formatPrice(price: number): string {
+  return `$${price.toFixed(2)}`;
+}
+
+function normalizeProduct(raw: RawProduct): Product {
+  return { ...raw, price: parseFloat(raw.price) };
+}
+
 export async function fetchProducts(apiUrl: string): Promise<Product[]> {
   const res = await fetch(`${apiUrl}/api/products`);
   if (!res.ok) {
     throw new Error(`Failed to fetch products: ${res.status}`);
   }
-  return res.json();
+  const raw: RawProduct[] = await res.json();
+  return raw.map(normalizeProduct);
 }
 
 export async function fetchProduct(apiUrl: string, id: number): Promise<Product> {
@@ -27,7 +48,8 @@ export async function fetchProduct(apiUrl: string, id: number): Promise<Product>
   if (!res.ok) {
     throw new Error(`Failed to fetch product ${id}: ${res.status}`);
   }
-  return res.json();
+  const raw: RawProduct = await res.json();
+  return normalizeProduct(raw);
 }
 
 export async function createProduct(
@@ -44,7 +66,8 @@ export async function createProduct(
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error ?? `Failed to create product: ${res.status}`);
   }
-  return res.json();
+  const raw: RawProduct = await res.json();
+  return normalizeProduct(raw);
 }
 
 export async function updateProduct(
@@ -62,7 +85,8 @@ export async function updateProduct(
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error ?? `Failed to update product: ${res.status}`);
   }
-  return res.json();
+  const raw: RawProduct = await res.json();
+  return normalizeProduct(raw);
 }
 
 export async function deleteProduct(apiUrl: string, token: string, id: number): Promise<void> {

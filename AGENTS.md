@@ -112,8 +112,6 @@ backend/src/
 │   ├── admin.ts           # POST/PUT/DELETE products (authed)
 │   ├── health.ts          # GET /api/health
 │   └── products.ts        # GET products (public)
-├── schemas/
-│   └── product.ts         # JSON schemas for validation
 └── migrations/
     └── 001_create_products.ts
 

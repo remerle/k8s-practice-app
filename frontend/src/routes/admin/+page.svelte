@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
-  import { fetchProducts, deleteProduct, type Product } from '$lib/api';
+  import { fetchProducts, deleteProduct, formatPrice, type Product } from '$lib/api';
   import { getIdToken } from '$lib/stores/auth';
 
   const apiUrl = $derived($page.data.apiUrl);
@@ -39,7 +39,7 @@
 
 <div class="admin-toolbar">
   <h2>Products</h2>
-  <a href="/admin/new" class="btn-primary" style="text-decoration:none">Add Product</a>
+  <a href="/admin/new" class="btn-primary btn-link">Add Product</a>
 </div>
 
 {#if error}
@@ -73,11 +73,9 @@
           </td>
           <td>{product.name}</td>
           <td><code>{product.sku}</code></td>
-          <td>${parseFloat(product.price).toFixed(2)}</td>
+          <td>{formatPrice(product.price)}</td>
           <td class="actions">
-            <a href="/admin/edit/{product.id}" class="btn-secondary" style="text-decoration:none"
-              >Edit</a
-            >
+            <a href="/admin/edit/{product.id}" class="btn-secondary btn-link">Edit</a>
             <button class="btn-danger" onclick={() => handleDelete(product)}>Delete</button>
           </td>
         </tr>
@@ -149,5 +147,9 @@
     background: var(--color-bg);
     padding: 0.125rem 0.375rem;
     border-radius: 4px;
+  }
+
+  .btn-link {
+    text-decoration: none;
   }
 </style>

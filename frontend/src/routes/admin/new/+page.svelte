@@ -78,7 +78,7 @@
       <input id="image" type="file" accept="image/*" onchange={handleFileChange} />
     </div>
     <div class="form-actions">
-      <a href="/admin" class="btn-secondary" style="text-decoration:none">Cancel</a>
+      <a href="/admin" class="btn-secondary btn-link">Cancel</a>
       <button type="submit" class="btn-primary" disabled={saving}>
         {saving ? 'Saving...' : 'Create Product'}
       </button>
@@ -126,5 +126,9 @@
   .error {
     color: var(--color-danger);
     margin-bottom: 1rem;
+  }
+
+  .btn-link {
+    text-decoration: none;
   }
 </style>
