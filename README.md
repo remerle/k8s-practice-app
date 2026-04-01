@@ -34,27 +34,28 @@ Frontend runs on `http://localhost:5173`, backend on `http://localhost:3000`.
 
 ## Available Commands
 
-| Command               | Description                                                 |
-| --------------------- | ----------------------------------------------------------- |
-| `just install`        | Install all dependencies                                    |
-| `just setup`          | First-time setup (install + DB + migrations)                |
-| `just dev`            | Run both frontend and backend                               |
-| `just dev-frontend`   | Run frontend only                                           |
-| `just dev-backend`    | Run backend only                                            |
-| `just db-up`          | Start local Postgres                                        |
-| `just db-down`        | Stop local Postgres                                         |
-| `just migrate`        | Run database migrations                                     |
-| `just format`         | Format all code with Prettier                               |
-| `just format-check`   | Check formatting without writing                            |
-| `just lint`           | Lint all code with ESLint                                   |
-| `just lint-fix`       | Lint and auto-fix fixable issues                            |
-| `just test`           | Run all tests (requires a `test` script in both workspaces) |
-| `just test-backend`   | Run backend tests only (requires Postgres)                  |
-| `just test-frontend`  | Run frontend tests only                                     |
-| `just check-frontend` | Type-check the frontend                                     |
-| `just build`          | Build both packages                                         |
-| `just validate`       | Full validation (format check + lint + typecheck + tests)   |
-| `just docker-build`   | Build Docker images locally                                 |
+| Command               | Description                                                    |
+| --------------------- | -------------------------------------------------------------- |
+| `just install`        | Install all dependencies                                       |
+| `just setup`          | First-time setup (install + DB + migrations)                   |
+| `just dev`            | Run both frontend and backend                                  |
+| `just dev-frontend`   | Run frontend only                                              |
+| `just dev-backend`    | Run backend only                                               |
+| `just db-up`          | Start local Postgres                                           |
+| `just db-down`        | Stop local Postgres                                            |
+| `just migrate`        | Run database migrations                                        |
+| `just format`         | Format all code with Prettier                                  |
+| `just format-check`   | Check formatting without writing                               |
+| `just lint`           | Lint all code with ESLint                                      |
+| `just lint-fix`       | Lint and auto-fix fixable issues                               |
+| `just test`           | Run all tests (requires a `test` script in both workspaces)    |
+| `just test-backend`   | Run backend tests only (requires Postgres)                     |
+| `just test-frontend`  | Run frontend tests only                                        |
+| `just check-backend`  | Type-check the backend                                         |
+| `just check-frontend` | Type-check the frontend                                        |
+| `just build`          | Build both packages                                            |
+| `just validate`       | Full validation (format check + lint + typecheck both + tests) |
+| `just docker-build`   | Build Docker images locally                                    |
 
 ## Configuration
 

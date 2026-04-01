@@ -19,7 +19,7 @@ just dev           # Run frontend + backend concurrently
 just format        # Prettier (includes Svelte files)
 just lint          # ESLint
 just test          # Run all tests
-just validate      # Full check: format check, lint, frontend typecheck, tests
+just validate      # Full check: format check, lint, typecheck both, tests
 just migrate       # Run Knex migrations (requires Postgres)
 ```
 

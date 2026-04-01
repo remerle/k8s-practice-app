@@ -59,6 +59,10 @@ test-frontend:
 # Run all tests
 test: test-backend test-frontend
 
+# Type-check the backend
+check-backend:
+    npm run check --workspace=backend
+
 # Type-check the frontend
 check-frontend:
     npm run check --workspace=frontend
@@ -75,7 +79,7 @@ build-frontend:
 build: build-backend build-frontend
 
 # Full validation: format check, lint, type check, tests
-validate: format-check lint check-frontend test
+validate: format-check lint check-backend check-frontend test
 
 # Build Docker images locally
 docker-build:
