@@ -103,17 +103,21 @@
             {#each products as product (product.id)}
               <tr class="hover">
                 <td>
-                  {#if product.image_location}
-                    <div class="avatar">
-                      <div class="w-12 h-12 rounded">
-                        <img src="/images/{product.image_location}" alt={product.name} />
+                  <a href="/admin/edit/{product.id}">
+                    {#if product.image_location}
+                      <div class="avatar">
+                        <div class="w-12 h-12 rounded">
+                          <img src="/images/{product.image_location}" alt={product.name} />
+                        </div>
                       </div>
-                    </div>
-                  {:else}
-                    <span class="text-base-content/40">--</span>
-                  {/if}
+                    {:else}
+                      <span class="text-base-content/40">--</span>
+                    {/if}
+                  </a>
                 </td>
-                <td class="font-medium">{product.name}</td>
+                <td class="font-medium">
+                  <a href="/admin/edit/{product.id}" class="link link-hover">{product.name}</a>
+                </td>
                 <td><code class="badge badge-ghost font-mono text-xs">{product.sku}</code></td>
                 <td class="font-medium">{formatPrice(product.price)}</td>
                 <td>
