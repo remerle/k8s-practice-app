@@ -21,7 +21,7 @@
     {/each}
   </div>
 
-  <div class="flex justify-between items-center p-6 bg-base-200 rounded-xl">
+  <div class="flex justify-between items-center p-6 bg-base-100 shadow rounded-xl">
     <button class="btn btn-outline btn-sm" onclick={() => cart.clear()}>Clear Cart</button>
     <div class="text-xl">
       <span class="text-base-content/70">Total ({$cartCount} items):</span>

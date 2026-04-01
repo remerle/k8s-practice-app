@@ -72,7 +72,7 @@
 {#if loading}
   <p class="text-center py-8">Loading product...</p>
 {:else}
-  <div class="card bg-base-200 shadow-sm max-w-2xl">
+  <div class="card bg-base-100 shadow-md max-w-2xl">
     <div class="card-body">
       <h2 class="card-title text-xl mb-2">Edit Product</h2>
       <p class="text-sm text-base-content/50 mb-4">Update product details below.</p>

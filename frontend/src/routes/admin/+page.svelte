@@ -55,7 +55,7 @@
   </div>
 {/if}
 
-<div class="card bg-base-200 shadow-sm">
+<div class="card bg-base-100 shadow-md">
   <div class="card-body p-0">
     <div class="flex justify-between items-center px-6 pt-5 pb-4">
       <div class="flex items-center gap-3">

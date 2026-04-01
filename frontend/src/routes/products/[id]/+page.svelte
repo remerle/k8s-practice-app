@@ -23,7 +23,7 @@
 
 <a href="/" class="btn btn-ghost btn-sm mb-6">&larr; Back to products</a>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-0 bg-base-200 rounded-2xl shadow-sm overflow-hidden max-w-4xl">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-0 bg-base-100 shadow rounded-2xl shadow-sm overflow-hidden max-w-4xl">
   <figure class="aspect-square bg-base-300">
     {#if product.image_location}
       <img src="/images/{product.image_location}" alt={product.name} class="w-full h-full object-cover" />

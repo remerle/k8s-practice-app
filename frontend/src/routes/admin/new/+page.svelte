@@ -48,7 +48,7 @@
 
 <a href="/admin" class="btn btn-ghost btn-sm mb-6">&larr; Back to products</a>
 
-<div class="card bg-base-200 shadow-sm max-w-2xl">
+<div class="card bg-base-100 shadow-md max-w-2xl">
   <div class="card-body">
     <h2 class="card-title text-xl mb-2">New Product</h2>
     <p class="text-sm text-base-content/50 mb-4">Fill in the details to add a new product.</p>

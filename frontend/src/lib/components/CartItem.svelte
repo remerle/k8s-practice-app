@@ -15,7 +15,7 @@
   }
 </script>
 
-<div class="flex items-center gap-4 p-4 bg-base-200 rounded-xl">
+<div class="flex items-center gap-4 p-4 bg-base-100 shadow rounded-xl">
   <div class="w-20 h-20 rounded-lg overflow-hidden bg-base-300 shrink-0">
     {#if item.imageLocation}
       <img src="/images/{item.imageLocation}" alt={item.name} class="w-full h-full object-cover" />
