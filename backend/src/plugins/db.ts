@@ -1,5 +1,5 @@
 import fp from 'fastify-plugin';
-import Knex from 'knex';
+import knex, { type Knex } from 'knex';
 import { FastifyPluginAsync } from 'fastify';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -7,12 +7,12 @@ import { config } from '../config.js';
 
 declare module 'fastify' {
   interface FastifyInstance {
-    knex: Knex.Knex;
+    knex: Knex;
   }
 }
 
 const dbPlugin: FastifyPluginAsync = async (app) => {
-  const knex = Knex.default({
+  const db = knex({
     client: 'pg',
     connection: config.databaseUrl,
     pool: {
@@ -23,15 +23,15 @@ const dbPlugin: FastifyPluginAsync = async (app) => {
     },
   });
 
-  app.decorate('knex', knex);
+  app.decorate('knex', db);
 
   app.addHook('onClose', async () => {
-    await knex.destroy();
+    await db.destroy();
   });
 
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-  await knex.migrate.latest({
+  await db.migrate.latest({
     directory: path.join(__dirname, '../migrations'),
   });
 

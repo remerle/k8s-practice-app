@@ -77,16 +77,16 @@ The backend binds to `0.0.0.0` on the configured port.
 
 ### Frontend
 
-| Variable                       | Required | Default                 | Description                                                       |
-| ------------------------------ | -------- | ----------------------- | ----------------------------------------------------------------- |
+| Variable                       | Required | Default                 | Description                                                                                       |
+| ------------------------------ | -------- | ----------------------- | ------------------------------------------------------------------------------------------------- |
 | `API_URL`                      | No       | `http://localhost:3000` | Backend API base URL (server-only; used by SSR loads and the proxy, never exposed to the browser) |
-| `FIREBASE_API_KEY`             | No\*     | `''`                    | Firebase client API key                                           |
-| `FIREBASE_AUTH_DOMAIN`         | No\*     | `''`                    | Firebase auth domain                                              |
-| `FIREBASE_PROJECT_ID`          | No\*     | `''`                    | Firebase project ID                                               |
-| `FIREBASE_STORAGE_BUCKET`      | No\*     | `''`                    | Firebase storage bucket                                           |
-| `FIREBASE_MESSAGING_SENDER_ID` | No\*     | `''`                    | Firebase messaging sender ID                                      |
-| `FIREBASE_APP_ID`              | No\*     | `''`                    | Firebase app ID                                                   |
-| `PORT`                         | No       | `3000`                  | Port the frontend listens on (adapter-node)                       |
+| `FIREBASE_API_KEY`             | No\*     | `''`                    | Firebase client API key                                                                           |
+| `FIREBASE_AUTH_DOMAIN`         | No\*     | `''`                    | Firebase auth domain                                                                              |
+| `FIREBASE_PROJECT_ID`          | No\*     | `''`                    | Firebase project ID                                                                               |
+| `FIREBASE_STORAGE_BUCKET`      | No\*     | `''`                    | Firebase storage bucket                                                                           |
+| `FIREBASE_MESSAGING_SENDER_ID` | No\*     | `''`                    | Firebase messaging sender ID                                                                      |
+| `FIREBASE_APP_ID`              | No\*     | `''`                    | Firebase app ID                                                                                   |
+| `PORT`                         | No       | `3000`                  | Port the frontend listens on (adapter-node)                                                       |
 
 \* Required for admin authentication to work. The app starts without them, but Firebase auth (Google sign-in for admin) will not function.
 

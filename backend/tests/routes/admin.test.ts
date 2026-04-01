@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import Fastify, { FastifyRequest, FastifyReply } from 'fastify';
-import Knex from 'knex';
+import knex, { type Knex } from 'knex';
 import fp from 'fastify-plugin';
 import multipart from '@fastify/multipart';
 import adminRoutes from '../../src/routes/admin.js';
@@ -14,15 +14,15 @@ type AuthMode = 'allow' | 'reject';
 
 async function buildAdminApp(authMode: AuthMode = 'allow') {
   const app = Fastify({ logger: false });
-  const knex = Knex.default({ client: 'pg', connection: TEST_DB_URL });
+  const db = knex({ client: 'pg', connection: TEST_DB_URL });
 
   const imageDir = fs.mkdtempSync(path.join(os.tmpdir(), 'test-images-'));
 
   const dbPlugin = fp(
     async (instance) => {
-      instance.decorate('knex', knex);
+      instance.decorate('knex', db);
       instance.addHook('onClose', async () => {
-        await knex.destroy();
+        await db.destroy();
       });
     },
     { name: 'db' },
@@ -51,14 +51,14 @@ async function buildAdminApp(authMode: AuthMode = 'allow') {
   await app.register(authPlugin);
   await app.register(adminRoutes, { imageStoragePath: imageDir });
 
-  await knex('products').del();
+  await db('products').del();
 
-  return { app, knex, imageDir };
+  return { app, knex: db, imageDir };
 }
 
 describe('Auth preHandler rejection', () => {
   let app: Awaited<ReturnType<typeof Fastify>>;
-  let knex: Knex.Knex;
+  let knex: Knex;
   let imageDir: string;
 
   beforeEach(async () => {
@@ -112,7 +112,7 @@ describe('Auth preHandler rejection', () => {
 
 describe('POST /api/products', () => {
   let app: Awaited<ReturnType<typeof Fastify>>;
-  let _knex: Knex.Knex;
+  let _knex: Knex;
   let imageDir: string;
 
   beforeEach(async () => {
@@ -241,7 +241,7 @@ describe('POST /api/products', () => {
 
 describe('PUT /api/products/:id', () => {
   let app: Awaited<ReturnType<typeof Fastify>>;
-  let knex: Knex.Knex;
+  let knex: Knex;
   let imageDir: string;
 
   beforeEach(async () => {
@@ -419,7 +419,7 @@ describe('PUT /api/products/:id', () => {
 
 describe('DELETE /api/products/:id', () => {
   let app: Awaited<ReturnType<typeof Fastify>>;
-  let knex: Knex.Knex;
+  let knex: Knex;
   let imageDir: string;
 
   beforeEach(async () => {

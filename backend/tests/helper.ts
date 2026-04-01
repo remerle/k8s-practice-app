@@ -1,5 +1,5 @@
 import Fastify from 'fastify';
-import Knex from 'knex';
+import knex from 'knex';
 import fp from 'fastify-plugin';
 import productRoutes from '../src/routes/products.js';
 
@@ -12,12 +12,12 @@ const TEST_DB_URL = process.env.DATABASE_URL ?? 'postgres://shop:shop@localhost:
 export async function buildApp() {
   const app = Fastify({ logger: false });
 
-  const knex = Knex.default({ client: 'pg', connection: TEST_DB_URL });
+  const db = knex({ client: 'pg', connection: TEST_DB_URL });
   const dbPlugin = fp(
     async (instance) => {
-      instance.decorate('knex', knex);
+      instance.decorate('knex', db);
       instance.addHook('onClose', async () => {
-        await knex.destroy();
+        await db.destroy();
       });
     },
     { name: 'db' },
@@ -26,7 +26,7 @@ export async function buildApp() {
   await app.register(dbPlugin);
   await app.register(productRoutes);
 
-  await knex('products').del();
+  await db('products').del();
 
   return app;
 }
