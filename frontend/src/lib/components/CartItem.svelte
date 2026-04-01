@@ -4,9 +4,14 @@
 
   let { item }: { item: CartItem } = $props();
 
-  function handleQuantityChange(e: Event) {
-    const value = parseInt((e.target as HTMLInputElement).value, 10);
-    cart.updateQuantity(item.productId, value);
+  function decrement() {
+    if (item.quantity > 1) {
+      cart.updateQuantity(item.productId, item.quantity - 1);
+    }
+  }
+
+  function increment() {
+    cart.updateQuantity(item.productId, item.quantity + 1);
   }
 </script>
 
@@ -20,14 +25,17 @@
   </div>
   <div class="flex-1">
     <h3 class="font-semibold">{item.name}</h3>
-    <p class="text-sm text-base-content/60">${item.price.toFixed(2)}</p>
+    <p class="text-sm text-base-content/60">${item.price.toFixed(2)} each</p>
   </div>
-  <div class="flex items-center gap-2">
-    <input type="number" min="1" value={item.quantity} onchange={handleQuantityChange}
-      class="input input-bordered input-sm w-16 text-center" />
-    <button class="btn btn-error btn-sm" onclick={() => cart.removeItem(item.productId)}>Remove</button>
+  <div class="join">
+    <button class="btn btn-sm join-item" onclick={decrement} disabled={item.quantity <= 1}>-</button>
+    <span class="btn btn-sm join-item no-animation pointer-events-none tabular-nums w-12">{item.quantity}</span>
+    <button class="btn btn-sm join-item" onclick={increment}>+</button>
   </div>
-  <div class="font-bold text-lg min-w-[80px] text-right">
+  <div class="font-bold text-lg min-w-[80px] text-right tabular-nums">
     ${(item.price * item.quantity).toFixed(2)}
   </div>
+  <button class="btn btn-ghost btn-sm btn-square text-error" onclick={() => cart.removeItem(item.productId)} title="Remove">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+  </button>
 </div>

@@ -4,6 +4,7 @@
   import { onMount } from 'svelte';
   import { fetchProduct, updateProduct } from '$lib/api';
   import { getIdToken } from '$lib/stores/auth';
+  import { showToast } from '$lib/stores/toast';
 
   const productId = $derived(parseInt($page.params.id ?? '', 10));
 
@@ -52,6 +53,7 @@
         formData.append('image', imageFile);
       }
       await updateProduct(token, productId, formData);
+      showToast('Product updated');
       goto('/admin');
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to update product';

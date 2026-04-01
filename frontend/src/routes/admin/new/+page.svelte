@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation';
   import { createProduct } from '$lib/api';
   import { getIdToken } from '$lib/stores/auth';
+  import { showToast } from '$lib/stores/toast';
 
   let name = $state('');
   let sku = $state('');
@@ -31,6 +32,7 @@
         formData.append('image', imageFile);
       }
       await createProduct(token, formData);
+      showToast('Product created');
       goto('/admin');
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to create product';

@@ -1,11 +1,10 @@
 <script lang="ts">
   import { formatPrice } from '$lib/api';
   import { cart } from '$lib/stores/cart';
+  import { showToast } from '$lib/stores/toast';
 
   let { data } = $props();
   const product = $derived(data.product);
-
-  let added = $state(false);
 
   function addToCart() {
     cart.addItem({
@@ -14,10 +13,7 @@
       price: product.price,
       imageLocation: product.image_location,
     });
-    added = true;
-    setTimeout(() => {
-      added = false;
-    }, 2000);
+    showToast(`${product.name} added to cart`);
   }
 </script>
 
@@ -46,7 +42,7 @@
     {/if}
     <div class="mt-auto pt-4">
       <button class="btn btn-primary btn-lg" onclick={addToCart}>
-        {added ? 'Added!' : 'Add to Cart'}
+        Add to Cart
       </button>
     </div>
   </div>
