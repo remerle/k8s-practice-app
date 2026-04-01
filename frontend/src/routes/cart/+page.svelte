@@ -4,7 +4,7 @@
 </script>
 
 <svelte:head>
-  <title>Cart - K8s Shop</title>
+  <title>Cart - Ye Olde Shoppe</title>
 </svelte:head>
 
 <h1 class="text-3xl font-bold mb-6">Shopping Cart</h1>

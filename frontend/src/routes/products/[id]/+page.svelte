@@ -18,7 +18,7 @@
 </script>
 
 <svelte:head>
-  <title>{product.name} - K8s Shop</title>
+  <title>{product.name} - Ye Olde Shoppe</title>
 </svelte:head>
 
 <a href="/" class="btn btn-ghost btn-sm mb-6">&larr; Back to products</a>
