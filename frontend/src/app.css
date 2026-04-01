@@ -3,6 +3,11 @@
   themes: dark, light;
 }
 
-body {
-  @apply bg-base-200;
+html, body {
+  @apply bg-base-200 min-h-screen;
+}
+
+/* Cards need a subtle ring to pop off dark backgrounds where shadows are invisible */
+:root[data-theme="dark"] .card {
+  @apply ring-1 ring-white/10;
 }
