@@ -2,3 +2,7 @@
 @plugin "daisyui" {
   themes: dark, light;
 }
+
+body {
+  @apply bg-base-200;
+}
