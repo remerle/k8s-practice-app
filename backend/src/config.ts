@@ -1,5 +1,3 @@
-import 'dotenv/config';
-
 interface Config {
   databaseUrl: string;
   imageStoragePath: string;
@@ -8,8 +6,11 @@ interface Config {
   corsOrigin: string;
 }
 
-function requireEnv(name: string): string {
-  const value = process.env[name];
+const DEFAULT_DEV_DATABASE_URL = 'postgres://shop:shop@localhost:5432/shop';
+const DEFAULT_DEV_FIREBASE_PROJECT_ID = 'k8s-practice-app';
+
+function requireEnv(name: string, defaultValue?: string): string {
+  const value = process.env[name] ?? defaultValue;
   if (!value) {
     throw new Error(`Missing required environment variable: ${name}`);
   }
@@ -25,9 +26,9 @@ function parsePort(value: string): number {
 }
 
 export const config: Config = {
-  databaseUrl: requireEnv('DATABASE_URL'),
+  databaseUrl: requireEnv('DATABASE_URL', DEFAULT_DEV_DATABASE_URL),
   imageStoragePath: process.env.IMAGE_STORAGE_PATH ?? './images',
   port: parsePort(process.env.PORT ?? '3000'),
-  firebaseProjectId: requireEnv('FIREBASE_PROJECT_ID'),
+  firebaseProjectId: requireEnv('FIREBASE_PROJECT_ID', DEFAULT_DEV_FIREBASE_PROJECT_ID),
   corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
 };

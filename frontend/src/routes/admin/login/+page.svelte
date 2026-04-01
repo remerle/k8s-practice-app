@@ -32,51 +32,17 @@
   }
 </script>
 
-<div class="login-page">
-  <div class="login-card">
-    <h1>Admin Login</h1>
-    <p>Sign in with your Google account to manage products.</p>
-    {#if error}
-      <p class="error">{error}</p>
-    {/if}
-    <button class="btn-primary login-btn" onclick={handleLogin}> Sign in with Google </button>
+<div class="flex justify-center pt-16">
+  <div class="card bg-base-100 shadow-sm border border-base-300 max-w-sm w-full">
+    <div class="card-body text-center">
+      <h1 class="card-title justify-center text-2xl">Admin Login</h1>
+      <p class="text-base-content/60 mb-4">Sign in with your Google account to manage products.</p>
+      {#if error}
+        <div role="alert" class="alert alert-error mb-4">
+          <span>{error}</span>
+        </div>
+      {/if}
+      <button class="btn btn-primary w-full" onclick={handleLogin}>Sign in with Google</button>
+    </div>
   </div>
 </div>
-
-<style>
-  .login-page {
-    display: flex;
-    justify-content: center;
-    padding-top: 4rem;
-  }
-
-  .login-card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    padding: 2rem;
-    max-width: 400px;
-    width: 100%;
-    text-align: center;
-  }
-
-  .login-card h1 {
-    margin-bottom: 0.5rem;
-  }
-
-  .login-card p {
-    color: var(--color-text-muted);
-    margin-bottom: 1.5rem;
-  }
-
-  .login-btn {
-    width: 100%;
-    padding: 0.75rem;
-    font-size: 1rem;
-  }
-
-  .error {
-    color: var(--color-danger);
-    margin-bottom: 1rem;
-  }
-</style>

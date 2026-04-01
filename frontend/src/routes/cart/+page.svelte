@@ -7,75 +7,25 @@
   <title>Cart - K8s Shop</title>
 </svelte:head>
 
-<h1>Shopping Cart</h1>
+<h1 class="text-3xl font-bold mb-6">Shopping Cart</h1>
 
 {#if $cartCount === 0}
-  <div class="empty">
-    <p>Your cart is empty.</p>
-    <a href="/" class="btn-primary browse-btn"> Browse Products </a>
+  <div class="text-center py-16">
+    <p class="text-lg text-base-content/60 mb-6">Your cart is empty.</p>
+    <a href="/" class="btn btn-primary">Browse Products</a>
   </div>
 {:else}
-  <div class="cart-items">
+  <div class="flex flex-col gap-3 mb-6">
     {#each $cart as item (item.productId)}
       <CartItemComponent {item} />
     {/each}
   </div>
 
-  <div class="cart-footer">
-    <button class="btn-secondary" onclick={() => cart.clear()}>Clear Cart</button>
-    <div class="cart-total">
-      <span>Total ({$cartCount} items):</span>
-      <strong>${$cartTotal.toFixed(2)}</strong>
+  <div class="flex justify-between items-center p-6 bg-base-200 rounded-xl">
+    <button class="btn btn-outline btn-sm" onclick={() => cart.clear()}>Clear Cart</button>
+    <div class="text-xl">
+      <span class="text-base-content/70">Total ({$cartCount} items):</span>
+      <strong class="text-primary text-2xl ml-2">${$cartTotal.toFixed(2)}</strong>
     </div>
   </div>
 {/if}
-
-<style>
-  h1 {
-    margin-bottom: 1.5rem;
-  }
-
-  .empty {
-    text-align: center;
-    padding: 3rem;
-    color: var(--color-text-muted);
-  }
-
-  .empty p {
-    margin-bottom: 1.5rem;
-    font-size: 1.125rem;
-  }
-
-  .browse-btn {
-    display: inline-block;
-    padding: 0.75rem 1.5rem;
-    text-decoration: none;
-  }
-
-  .cart-items {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .cart-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-  }
-
-  .cart-total {
-    font-size: 1.25rem;
-  }
-
-  .cart-total strong {
-    color: var(--color-primary);
-    margin-left: 0.5rem;
-    font-size: 1.5rem;
-  }
-</style>

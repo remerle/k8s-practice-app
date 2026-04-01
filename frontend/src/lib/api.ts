@@ -1,6 +1,8 @@
 /**
  * API client for the backend. All product data flows through these functions.
- * The apiUrl is passed from the layout server load function.
+ *
+ * apiUrl is optional: omit it (or pass '') for relative paths (client-side),
+ * pass the full backend URL for SSR load functions.
  */
 
 interface RawProduct {
@@ -34,7 +36,7 @@ function normalizeProduct(raw: RawProduct): Product {
   return { ...raw, price: parseFloat(raw.price) };
 }
 
-export async function fetchProducts(apiUrl: string): Promise<Product[]> {
+export async function fetchProducts(apiUrl = ''): Promise<Product[]> {
   const res = await fetch(`${apiUrl}/api/products`);
   if (!res.ok) {
     throw new Error(`Failed to fetch products: ${res.status}`);
@@ -43,7 +45,7 @@ export async function fetchProducts(apiUrl: string): Promise<Product[]> {
   return raw.map(normalizeProduct);
 }
 
-export async function fetchProduct(apiUrl: string, id: number): Promise<Product> {
+export async function fetchProduct(apiUrl = '', id: number): Promise<Product> {
   const res = await fetch(`${apiUrl}/api/products/${id}`);
   if (!res.ok) {
     throw new Error(`Failed to fetch product ${id}: ${res.status}`);
@@ -52,12 +54,8 @@ export async function fetchProduct(apiUrl: string, id: number): Promise<Product>
   return normalizeProduct(raw);
 }
 
-export async function createProduct(
-  apiUrl: string,
-  token: string,
-  data: FormData,
-): Promise<Product> {
-  const res = await fetch(`${apiUrl}/api/products`, {
+export async function createProduct(token: string, data: FormData): Promise<Product> {
+  const res = await fetch('/api/products', {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
     body: data,
@@ -70,13 +68,8 @@ export async function createProduct(
   return normalizeProduct(raw);
 }
 
-export async function updateProduct(
-  apiUrl: string,
-  token: string,
-  id: number,
-  data: FormData,
-): Promise<Product> {
-  const res = await fetch(`${apiUrl}/api/products/${id}`, {
+export async function updateProduct(token: string, id: number, data: FormData): Promise<Product> {
+  const res = await fetch(`/api/products/${id}`, {
     method: 'PUT',
     headers: { Authorization: `Bearer ${token}` },
     body: data,
@@ -89,8 +82,8 @@ export async function updateProduct(
   return normalizeProduct(raw);
 }
 
-export async function deleteProduct(apiUrl: string, token: string, id: number): Promise<void> {
-  const res = await fetch(`${apiUrl}/api/products/${id}`, {
+export async function deleteProduct(token: string, id: number): Promise<void> {
+  const res = await fetch(`/api/products/${id}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` },
   });

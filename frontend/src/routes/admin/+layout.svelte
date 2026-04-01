@@ -31,32 +31,14 @@
 {#if $page.url.pathname.endsWith('/login')}
   {@render children()}
 {:else if $authLoading}
-  <p>Loading...</p>
+  <p class="text-center py-8">Loading...</p>
 {:else if $user}
-  <div class="admin-header">
-    <h1>Admin</h1>
-    <div class="admin-user">
-      <span>{$user.email}</span>
-      <button class="btn-secondary" onclick={handleLogout}>Sign Out</button>
+  <div class="flex justify-between items-center mb-6 pb-4 border-b border-base-300">
+    <h1 class="text-3xl font-bold">Admin</h1>
+    <div class="flex items-center gap-4">
+      <span class="text-sm text-base-content/60">{$user.email}</span>
+      <button class="btn btn-outline btn-sm" onclick={handleLogout}>Sign Out</button>
     </div>
   </div>
   {@render children()}
 {/if}
-
-<style>
-  .admin-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .admin-user {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    color: var(--color-text-muted);
-  }
-</style>

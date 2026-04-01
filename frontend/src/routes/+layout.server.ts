@@ -1,24 +1,24 @@
 import { env } from '$env/dynamic/private';
 import type { LayoutServerLoad } from './$types';
 
-function requireEnv(name: string): string {
-  const value = env[name as keyof typeof env];
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-  return value;
-}
+const FIREBASE_DEFAULTS = {
+  apiKey: 'AIzaSyArt3z_05CcCodv2ed_8L3h2PY2z91kgNc',
+  authDomain: 'k8s-practice-app.firebaseapp.com',
+  projectId: 'k8s-practice-app',
+  storageBucket: 'k8s-practice-app.firebasestorage.app',
+  messagingSenderId: '257579486757',
+  appId: '1:257579486757:web:a5d08bacb6f10fb7dff9cc',
+};
 
 export const load: LayoutServerLoad = async () => {
   return {
-    apiUrl: env.API_URL ?? 'http://localhost:3000',
     firebase: {
-      apiKey: requireEnv('FIREBASE_API_KEY'),
-      authDomain: requireEnv('FIREBASE_AUTH_DOMAIN'),
-      projectId: requireEnv('FIREBASE_PROJECT_ID'),
-      storageBucket: requireEnv('FIREBASE_STORAGE_BUCKET'),
-      messagingSenderId: requireEnv('FIREBASE_MESSAGING_SENDER_ID'),
-      appId: requireEnv('FIREBASE_APP_ID'),
+      apiKey: env.FIREBASE_API_KEY ?? FIREBASE_DEFAULTS.apiKey,
+      authDomain: env.FIREBASE_AUTH_DOMAIN ?? FIREBASE_DEFAULTS.authDomain,
+      projectId: env.FIREBASE_PROJECT_ID ?? FIREBASE_DEFAULTS.projectId,
+      storageBucket: env.FIREBASE_STORAGE_BUCKET ?? FIREBASE_DEFAULTS.storageBucket,
+      messagingSenderId: env.FIREBASE_MESSAGING_SENDER_ID ?? FIREBASE_DEFAULTS.messagingSenderId,
+      appId: env.FIREBASE_APP_ID ?? FIREBASE_DEFAULTS.appId,
     },
   };
 };

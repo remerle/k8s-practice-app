@@ -9,7 +9,7 @@
     "start": "node dist/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "migrate": "knex migrate:latest --knexfile knexfile.ts"
+    "migrate": "NODE_OPTIONS='--import tsx/esm' knex migrate:latest --knexfile knexfile.ts"
   },
   "dependencies": {
     "@fastify/cors": "^11.2.0",

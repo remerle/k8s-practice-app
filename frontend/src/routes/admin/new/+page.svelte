@@ -1,10 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
   import { createProduct } from '$lib/api';
   import { getIdToken } from '$lib/stores/auth';
-
-  const apiUrl = $derived($page.data.apiUrl);
 
   let name = $state('');
   let sku = $state('');
@@ -33,7 +30,7 @@
       if (imageFile) {
         formData.append('image', imageFile);
       }
-      await createProduct(apiUrl, token, formData);
+      await createProduct(token, formData);
       goto('/admin');
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to create product';
@@ -47,88 +44,46 @@
   <title>New Product - Admin</title>
 </svelte:head>
 
-<a href="/admin" class="back-link">← Back to products</a>
+<a href="/admin" class="btn btn-ghost btn-sm mb-6">&larr; Back to products</a>
 
-<div class="form-card">
-  <h2>New Product</h2>
+<div class="card bg-base-200 shadow-sm max-w-2xl">
+  <div class="card-body">
+    <h2 class="card-title text-xl mb-2">New Product</h2>
+    <p class="text-sm text-base-content/50 mb-4">Fill in the details to add a new product.</p>
 
-  {#if error}
-    <p class="error">{error}</p>
-  {/if}
+    {#if error}
+      <div role="alert" class="alert alert-error mb-4">
+        <span>{error}</span>
+      </div>
+    {/if}
 
-  <form onsubmit={handleSubmit}>
-    <div class="field">
-      <label for="name">Name</label>
-      <input id="name" type="text" bind:value={name} required />
-    </div>
-    <div class="field">
-      <label for="sku">SKU</label>
-      <input id="sku" type="text" bind:value={sku} required />
-    </div>
-    <div class="field">
-      <label for="price">Price</label>
-      <input id="price" type="number" step="0.01" min="0" bind:value={price} required />
-    </div>
-    <div class="field">
-      <label for="description">Description</label>
-      <textarea id="description" rows="4" bind:value={description}></textarea>
-    </div>
-    <div class="field">
-      <label for="image">Image</label>
-      <input id="image" type="file" accept="image/*" onchange={handleFileChange} />
-    </div>
-    <div class="form-actions">
-      <a href="/admin" class="btn-secondary btn-link">Cancel</a>
-      <button type="submit" class="btn-primary" disabled={saving}>
-        {saving ? 'Saving...' : 'Create Product'}
-      </button>
-    </div>
-  </form>
+    <form onsubmit={handleSubmit} class="space-y-4">
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Name</legend>
+        <input type="text" class="input w-full" bind:value={name} required />
+      </fieldset>
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">SKU</legend>
+        <input type="text" class="input w-full" bind:value={sku} required />
+      </fieldset>
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Price</legend>
+        <input type="number" step="0.01" min="0" class="input w-full" bind:value={price} required />
+      </fieldset>
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Description</legend>
+        <textarea class="textarea w-full" rows="4" bind:value={description}></textarea>
+      </fieldset>
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Image</legend>
+        <input type="file" accept="image/*" class="file-input file-input-bordered w-full" onchange={handleFileChange} />
+      </fieldset>
+      <div class="flex justify-end gap-2 pt-2">
+        <a href="/admin" class="btn btn-ghost">Cancel</a>
+        <button type="submit" class="btn btn-primary" disabled={saving}>
+          {saving ? 'Saving...' : 'Create Product'}
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
-
-<style>
-  .back-link {
-    display: inline-block;
-    margin-bottom: 1.5rem;
-    color: var(--color-text-muted);
-  }
-
-  .form-card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    padding: 2rem;
-    max-width: 600px;
-  }
-
-  .form-card h2 {
-    margin-bottom: 1.5rem;
-  }
-
-  .field {
-    margin-bottom: 1rem;
-  }
-
-  .field label {
-    display: block;
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-    font-size: 0.875rem;
-  }
-
-  .form-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    margin-top: 1.5rem;
-  }
-
-  .error {
-    color: var(--color-danger);
-    margin-bottom: 1rem;
-  }
-
-  .btn-link {
-    text-decoration: none;
-  }
-</style>

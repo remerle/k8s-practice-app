@@ -5,7 +5,6 @@ declare global {
     // interface Error {}
     // interface Locals {}
     interface PageData {
-      apiUrl: string;
       firebase: {
         apiKey: string;
         authDomain: string;

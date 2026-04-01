@@ -5,7 +5,6 @@
   import { fetchProduct, updateProduct } from '$lib/api';
   import { getIdToken } from '$lib/stores/auth';
 
-  const apiUrl = $derived($page.data.apiUrl);
   const productId = $derived(parseInt($page.params.id ?? '', 10));
 
   let name = $state('');
@@ -20,7 +19,7 @@
 
   onMount(async () => {
     try {
-      const product = await fetchProduct(apiUrl, productId);
+      const product = await fetchProduct('', productId);
       name = product.name;
       sku = product.sku;
       price = String(product.price);
@@ -52,7 +51,7 @@
       if (imageFile) {
         formData.append('image', imageFile);
       }
-      await updateProduct(apiUrl, token, productId, formData);
+      await updateProduct(token, productId, formData);
       goto('/admin');
     } catch (err) {
       error = err instanceof Error ? err.message : 'Failed to update product';
@@ -66,127 +65,63 @@
   <title>Edit Product - Admin</title>
 </svelte:head>
 
-<a href="/admin" class="back-link">← Back to products</a>
+<a href="/admin" class="btn btn-ghost btn-sm mb-6">&larr; Back to products</a>
 
 {#if loading}
-  <p>Loading product...</p>
+  <p class="text-center py-8">Loading product...</p>
 {:else}
-  <div class="form-card">
-    <h2>Edit Product</h2>
+  <div class="card bg-base-200 shadow-sm max-w-2xl">
+    <div class="card-body">
+      <h2 class="card-title text-xl mb-2">Edit Product</h2>
+      <p class="text-sm text-base-content/50 mb-4">Update product details below.</p>
 
-    {#if error}
-      <p class="error">{error}</p>
-    {/if}
+      {#if error}
+        <div role="alert" class="alert alert-error mb-4">
+          <span>{error}</span>
+        </div>
+      {/if}
 
-    <form onsubmit={handleSubmit}>
-      <div class="field">
-        <label for="name">Name</label>
-        <input id="name" type="text" bind:value={name} required />
-      </div>
-      <div class="field">
-        <label for="sku">SKU</label>
-        <input id="sku" type="text" bind:value={sku} required />
-      </div>
-      <div class="field">
-        <label for="price">Price</label>
-        <input id="price" type="number" step="0.01" min="0" bind:value={price} required />
-      </div>
-      <div class="field">
-        <label for="description">Description</label>
-        <textarea id="description" rows="4" bind:value={description}></textarea>
-      </div>
-      <div class="field">
-        <label for="image">Image</label>
-        {#if currentImage}
-          <div class="current-image">
-            <img src="{apiUrl}/images/{currentImage}" alt="Current" />
-            <span>Current image</span>
-          </div>
-        {/if}
-        <input id="image" type="file" accept="image/*" onchange={handleFileChange} />
-        {#if currentImage}
-          <p class="hint">Upload a new file to replace the current image.</p>
-        {/if}
-      </div>
-      <div class="form-actions">
-        <a href="/admin" class="btn-secondary btn-link">Cancel</a>
-        <button type="submit" class="btn-primary" disabled={saving}>
-          {saving ? 'Saving...' : 'Update Product'}
-        </button>
-      </div>
-    </form>
+      <form onsubmit={handleSubmit} class="space-y-4">
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Name</legend>
+          <input type="text" class="input w-full" bind:value={name} required />
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">SKU</legend>
+          <input type="text" class="input w-full" bind:value={sku} required />
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Price</legend>
+          <input type="number" step="0.01" min="0" class="input w-full" bind:value={price} required />
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Description</legend>
+          <textarea class="textarea w-full" rows="4" bind:value={description}></textarea>
+        </fieldset>
+        <fieldset class="fieldset">
+          <legend class="fieldset-legend">Image</legend>
+          {#if currentImage}
+            <div class="flex items-center gap-3 mb-2">
+              <div class="avatar">
+                <div class="w-16 h-16 rounded">
+                  <img src="/images/{currentImage}" alt="Current" />
+                </div>
+              </div>
+              <span class="text-sm text-base-content/60">Current image</span>
+            </div>
+          {/if}
+          <input type="file" accept="image/*" class="file-input file-input-bordered w-full" onchange={handleFileChange} />
+          {#if currentImage}
+            <p class="text-xs text-base-content/50 mt-1">Upload a new file to replace the current image.</p>
+          {/if}
+        </fieldset>
+        <div class="flex justify-end gap-2 pt-2">
+          <a href="/admin" class="btn btn-ghost">Cancel</a>
+          <button type="submit" class="btn btn-primary" disabled={saving}>
+            {saving ? 'Saving...' : 'Update Product'}
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 {/if}
-
-<style>
-  .back-link {
-    display: inline-block;
-    margin-bottom: 1.5rem;
-    color: var(--color-text-muted);
-  }
-
-  .form-card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    padding: 2rem;
-    max-width: 600px;
-  }
-
-  .form-card h2 {
-    margin-bottom: 1.5rem;
-  }
-
-  .field {
-    margin-bottom: 1rem;
-  }
-
-  .field label {
-    display: block;
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-    font-size: 0.875rem;
-  }
-
-  .current-image {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .current-image img {
-    width: 64px;
-    height: 64px;
-    object-fit: cover;
-    border-radius: 4px;
-    border: 1px solid var(--color-border);
-  }
-
-  .current-image span {
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-  }
-
-  .hint {
-    font-size: 0.8rem;
-    color: var(--color-text-muted);
-    margin-top: 0.25rem;
-  }
-
-  .form-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    margin-top: 1.5rem;
-  }
-
-  .error {
-    color: var(--color-danger);
-    margin-bottom: 1rem;
-  }
-
-  .btn-link {
-    text-decoration: none;
-  }
-</style>

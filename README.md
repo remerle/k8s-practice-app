@@ -22,6 +22,18 @@ Browser --> SvelteKit Frontend (proxy) --> Fastify Backend --> PostgreSQL
 
 ## Getting Started
 
+### Firebase Setup
+
+The admin panel requires Firebase Authentication with the Google provider enabled:
+
+1. Open the [Firebase Console](https://console.firebase.google.com/) and select the `k8s-practice-app` project
+2. Go to **Authentication** > **Sign-in method**
+3. Click **Google**, toggle **Enable**, set a support email, and click **Save**
+
+Without this, admin login will fail with `auth/configuration-not-found`.
+
+### Local Development
+
 ```bash
 # First-time setup: install deps, start Postgres, run migrations
 just setup
@@ -59,20 +71,17 @@ Frontend runs on `http://localhost:5173`, backend on `http://localhost:3000`.
 
 ## Configuration
 
-All configuration is via environment variables. See `.env.example` for the full list with defaults.
-
-```bash
-cp .env.example .env
-```
+All configuration is via environment variables. For local development, sensible defaults are built in so no `.env` file is needed. In production, set variables directly in your deployment environment.
 
 ### Backend
 
-| Variable              | Required | Default    | Description                                                                            |
-| --------------------- | -------- | ---------- | -------------------------------------------------------------------------------------- |
-| `DATABASE_URL`        | Yes      | -          | PostgreSQL connection string (e.g. `postgres://user:pass@host:5432/dbname`)            |
-| `FIREBASE_PROJECT_ID` | Yes      | -          | Firebase project ID for admin token verification                                       |
-| `PORT`                | No       | `3000`     | Port the backend listens on                                                            |
-| `IMAGE_STORAGE_PATH`  | No       | `./images` | Directory for uploaded product images (defaults to `/data/images` in the Docker image) |
+| Variable              | Required    | Default                                        | Description                                                                            |
+| --------------------- | ----------- | ---------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `DATABASE_URL`        | Production  | `postgres://shop:shop@localhost:5432/shop`     | PostgreSQL connection string                                                           |
+| `FIREBASE_PROJECT_ID` | Production  | `k8s-practice-app`                             | Firebase project ID for admin token verification                                       |
+| `PORT`                | No          | `3000`                                         | Port the backend listens on                                                            |
+| `IMAGE_STORAGE_PATH`  | No          | `./images`                                     | Directory for uploaded product images (defaults to `/data/images` in the Docker image) |
+| `CORS_ORIGIN`         | No          | `http://localhost:5173`                        | Allowed CORS origin                                                                    |
 
 The backend binds to `0.0.0.0` on the configured port.
 
@@ -81,15 +90,17 @@ The backend binds to `0.0.0.0` on the configured port.
 | Variable                       | Required | Default                 | Description                                                                                       |
 | ------------------------------ | -------- | ----------------------- | ------------------------------------------------------------------------------------------------- |
 | `API_URL`                      | No       | `http://localhost:3000` | Backend API base URL (server-only; used by SSR loads and the proxy, never exposed to the browser) |
-| `FIREBASE_API_KEY`             | No\*     | `''`                    | Firebase client API key                                                                           |
-| `FIREBASE_AUTH_DOMAIN`         | No\*     | `''`                    | Firebase auth domain                                                                              |
-| `FIREBASE_PROJECT_ID`          | No\*     | `''`                    | Firebase project ID                                                                               |
-| `FIREBASE_STORAGE_BUCKET`      | No\*     | `''`                    | Firebase storage bucket                                                                           |
-| `FIREBASE_MESSAGING_SENDER_ID` | No\*     | `''`                    | Firebase messaging sender ID                                                                      |
-| `FIREBASE_APP_ID`              | No\*     | `''`                    | Firebase app ID                                                                                   |
+| `FIREBASE_API_KEY`             | No       | dev project default     | Firebase client API key                                                                           |
+| `FIREBASE_AUTH_DOMAIN`         | No       | dev project default     | Firebase auth domain                                                                              |
+| `FIREBASE_PROJECT_ID`          | No       | dev project default     | Firebase project ID                                                                               |
+| `FIREBASE_STORAGE_BUCKET`      | No       | dev project default     | Firebase storage bucket                                                                           |
+| `FIREBASE_MESSAGING_SENDER_ID` | No       | dev project default     | Firebase messaging sender ID                                                                      |
+| `FIREBASE_APP_ID`              | No       | dev project default     | Firebase app ID                                                                                   |
 | `PORT`                         | No       | `3000`                  | Port the frontend listens on (adapter-node)                                                       |
 
-\* Required for admin authentication to work. The app starts without them, but Firebase auth (Google sign-in for admin) will not function.
+> [!NOTE]
+> All Firebase variables default to the shared dev project. Override them in production.
+> [Firebase console for k8s-practice-app](https://console.firebase.google.com/u/1/project/k8s-practice-app/settings/general/web:YjUyZjljOWQtZjFlYy00MzU3LWJiNzUtMGY2NjkwN2VjYmIy)
 
 The frontend reads environment variables at **runtime** (not build time) via SvelteKit's `$env/dynamic/private`. Firebase config is passed to the client via the layout server load function. `API_URL` is server-only; the frontend proxies `/api/*` and `/images/*` requests to the backend through `hooks.server.ts`, so client-side code uses relative paths.
 

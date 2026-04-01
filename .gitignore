@@ -42,3 +42,4 @@ images/
 # Superpowers (local planning artifacts)
 .superpowers/
 docs/superpowers/
+.playwright-mcp/

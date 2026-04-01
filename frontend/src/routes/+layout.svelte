@@ -5,47 +5,17 @@
   let { children } = $props();
 </script>
 
-<nav>
-  <div class="container nav-inner">
-    <a href="/" class="logo">K8s Shop</a>
-    <div class="nav-links">
-      <a href="/">Products</a>
-      <a href="/cart">Cart ({$cartCount})</a>
-      <a href="/admin">Admin</a>
-    </div>
+<div class="navbar bg-base-100 border-b border-base-300 mb-8 px-4">
+  <div class="flex-1">
+    <a href="/" class="btn btn-ghost text-xl font-bold">K8s Shop</a>
   </div>
-</nav>
+  <div class="flex gap-2">
+    <a href="/" class="btn btn-ghost btn-sm">Products</a>
+    <a href="/cart" class="btn btn-ghost btn-sm">Cart ({$cartCount})</a>
+    <a href="/admin" class="btn btn-ghost btn-sm">Admin</a>
+  </div>
+</div>
 
-<main class="container">
+<main class="max-w-7xl mx-auto px-4 pb-8">
   {@render children()}
 </main>
-
-<style>
-  nav {
-    background: var(--color-surface);
-    border-bottom: 1px solid var(--color-border);
-    padding: 1rem 0;
-    margin-bottom: 2rem;
-  }
-
-  .nav-inner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .logo {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--color-text);
-  }
-
-  .nav-links {
-    display: flex;
-    gap: 1.5rem;
-  }
-
-  main {
-    padding-bottom: 2rem;
-  }
-</style>

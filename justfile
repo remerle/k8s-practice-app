@@ -4,9 +4,9 @@
 install:
     npm install
 
-# Start local Postgres
+# Start local Postgres (waits until healthy)
 db-up:
-    docker compose up -d
+    docker compose up -d --wait
 
 # Stop local Postgres
 db-down:
@@ -25,7 +25,7 @@ dev-frontend:
     npm run dev --workspace=frontend
 
 # Run both frontend and backend
-dev:
+dev: db-up migrate
     #!/usr/bin/env bash
     trap 'kill 0' EXIT
     npm run dev --workspace=backend &
@@ -88,7 +88,5 @@ docker-build:
 
 # First-time setup: install deps, start DB, run migrations
 setup: install db-up
-    @echo "Waiting for Postgres to be ready..."
-    @sleep 2
     just migrate
     @echo "Done! Run 'just dev' to start the app."

@@ -1,76 +1,19 @@
 <script lang="ts">
   import { formatPrice, type Product } from '$lib/api';
 
-  let { product, apiUrl }: { product: Product; apiUrl: string } = $props();
+  let { product }: { product: Product } = $props();
 </script>
 
-<a href="/products/{product.id}" class="card">
-  <div class="card-image">
+<a href="/products/{product.id}" class="card bg-base-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200 overflow-hidden">
+  <figure class="aspect-[4/3] bg-base-300">
     {#if product.image_location}
-      <img src="{apiUrl}/images/{product.image_location}" alt={product.name} />
+      <img src="/images/{product.image_location}" alt={product.name} class="w-full h-full object-cover" />
     {:else}
-      <div class="placeholder">No Image</div>
+      <div class="w-full h-full flex items-center justify-center text-base-content/40">No Image</div>
     {/if}
-  </div>
-  <div class="card-body">
-    <h3>{product.name}</h3>
-    <p class="price">{formatPrice(product.price)}</p>
+  </figure>
+  <div class="card-body p-4">
+    <h3 class="card-title text-base">{product.name}</h3>
+    <p class="text-primary font-bold text-lg">{formatPrice(product.price)}</p>
   </div>
 </a>
-
-<style>
-  .card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    transition:
-      transform 0.15s,
-      box-shadow 0.15s;
-    display: block;
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    text-decoration: none;
-  }
-
-  .card-image {
-    aspect-ratio: 4 / 3;
-    overflow: hidden;
-    background: var(--color-bg);
-  }
-
-  .card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-text-muted);
-  }
-
-  .card-body {
-    padding: 1rem;
-  }
-
-  .card-body h3 {
-    font-size: 1rem;
-    margin-bottom: 0.25rem;
-  }
-
-  .price {
-    color: var(--color-primary);
-    font-weight: 600;
-  }
-</style>

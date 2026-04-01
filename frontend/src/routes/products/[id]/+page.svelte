@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { page } from '$app/stores';
   import { formatPrice } from '$lib/api';
   import { cart } from '$lib/stores/cart';
 
   let { data } = $props();
   const product = $derived(data.product);
-  const apiUrl = $derived($page.data.apiUrl);
 
   let added = $state(false);
 
@@ -27,94 +25,29 @@
   <title>{product.name} - K8s Shop</title>
 </svelte:head>
 
-<a href="/" class="back-link">← Back to products</a>
+<a href="/" class="btn btn-ghost btn-sm mb-6">&larr; Back to products</a>
 
-<div class="product-detail">
-  <div class="product-image">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-0 bg-base-200 rounded-2xl shadow-sm overflow-hidden max-w-4xl">
+  <figure class="aspect-square bg-base-300">
     {#if product.image_location}
-      <img src="{apiUrl}/images/{product.image_location}" alt={product.name} />
+      <img src="/images/{product.image_location}" alt={product.name} class="w-full h-full object-cover" />
     {:else}
-      <div class="placeholder">No Image</div>
+      <div class="w-full h-full flex items-center justify-center text-base-content/40 text-lg">No Image</div>
     {/if}
-  </div>
-  <div class="product-info">
-    <h1>{product.name}</h1>
-    <p class="sku">SKU: {product.sku}</p>
-    <p class="price">{formatPrice(product.price)}</p>
+  </figure>
+  <div class="p-8 flex flex-col gap-4">
+    <div>
+      <h1 class="text-2xl font-bold">{product.name}</h1>
+      <p class="text-sm text-base-content/50 mt-1">SKU: {product.sku}</p>
+    </div>
+    <p class="text-3xl font-bold text-primary">{formatPrice(product.price)}</p>
     {#if product.description}
-      <p class="description">{product.description}</p>
+      <p class="text-base-content/80 leading-relaxed">{product.description}</p>
     {/if}
-    <button class="btn-primary add-btn" onclick={addToCart}>
-      {added ? 'Added!' : 'Add to Cart'}
-    </button>
+    <div class="mt-auto pt-4">
+      <button class="btn btn-primary btn-lg" onclick={addToCart}>
+        {added ? 'Added!' : 'Add to Cart'}
+      </button>
+    </div>
   </div>
 </div>
-
-<style>
-  .back-link {
-    display: inline-block;
-    margin-bottom: 1.5rem;
-    color: var(--color-text-muted);
-  }
-
-  .product-detail {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-
-  .product-image {
-    aspect-ratio: 1;
-    background: var(--color-bg);
-  }
-
-  .product-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-text-muted);
-  }
-
-  .product-info {
-    padding: 2rem;
-  }
-
-  .product-info h1 {
-    margin-bottom: 0.5rem;
-  }
-
-  .sku {
-    color: var(--color-text-muted);
-    font-size: 0.875rem;
-    margin-bottom: 1rem;
-  }
-
-  .price {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-primary);
-    margin-bottom: 1rem;
-  }
-
-  .description {
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
-  }
-
-  .add-btn {
-    padding: 0.75rem 2rem;
-    font-size: 1rem;
-  }
-</style>
