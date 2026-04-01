@@ -74,11 +74,21 @@
       </label>
       <label class="floating-label w-full">
         <span>Description</span>
-        <textarea placeholder="Description" class="textarea textarea-bordered w-full" rows="4" bind:value={description}></textarea>
+        <textarea
+          placeholder="Description"
+          class="textarea textarea-bordered w-full"
+          rows="4"
+          bind:value={description}
+        ></textarea>
       </label>
       <fieldset class="fieldset">
         <legend class="fieldset-legend">Image</legend>
-        <input type="file" accept="image/*" class="file-input file-input-bordered w-full" onchange={handleFileChange} />
+        <input
+          type="file"
+          accept="image/*"
+          class="file-input file-input-bordered w-full"
+          onchange={handleFileChange}
+        />
       </fieldset>
       <div class="flex justify-end gap-2 pt-2">
         <a href="/admin" class="btn btn-ghost">Cancel</a>

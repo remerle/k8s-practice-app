@@ -98,7 +98,12 @@
         </label>
         <label class="floating-label w-full">
           <span>Description</span>
-          <textarea placeholder="Description" class="textarea textarea-bordered w-full" rows="4" bind:value={description}></textarea>
+          <textarea
+            placeholder="Description"
+            class="textarea textarea-bordered w-full"
+            rows="4"
+            bind:value={description}
+          ></textarea>
         </label>
         <fieldset class="fieldset">
           <legend class="fieldset-legend">Image</legend>
@@ -112,9 +117,16 @@
               <span class="text-sm text-base-content/60">Current image</span>
             </div>
           {/if}
-          <input type="file" accept="image/*" class="file-input file-input-bordered w-full" onchange={handleFileChange} />
+          <input
+            type="file"
+            accept="image/*"
+            class="file-input file-input-bordered w-full"
+            onchange={handleFileChange}
+          />
           {#if currentImage}
-            <p class="text-xs text-base-content/50 mt-1">Upload a new file to replace the current image.</p>
+            <p class="text-xs text-base-content/50 mt-1">
+              Upload a new file to replace the current image.
+            </p>
           {/if}
         </fieldset>
         <div class="flex justify-end gap-2 pt-2">

@@ -5,11 +5,11 @@ A simple e-commerce application. Monorepo with separately deployable frontend an
 ## Architecture
 
 ```
-Browser --> SvelteKit Frontend (proxy) --> Fastify Backend --> PostgreSQL
+Browser --> SvelteKit Frontend --> Fastify Backend --> PostgreSQL
 ```
 
-- **Frontend**: SvelteKit with adapter-node. The sole ingress point; proxies `/api/*` and `/images/*` requests to the backend via `hooks.server.ts`. Storefront (product browsing, cart) is public. Admin (`/admin`) requires Google sign-in via Firebase.
-- **Backend**: Fastify REST API. Internal service (not exposed externally). Serves product data and uploaded images. Admin routes protected by Firebase Admin SDK token verification.
+- **Frontend**: SvelteKit with adapter-node. SSR load functions fetch product data from the backend server-side. The backend URL (`API_URL`) is also passed to the client as page data so the browser can load images and make API calls directly. Storefront (product browsing, cart) is public. Admin (`/admin`) requires Google sign-in via Firebase.
+- **Backend**: Fastify REST API. Serves product data and uploaded images. Admin routes protected by Firebase Admin SDK token verification.
 - **Database**: PostgreSQL with Knex for queries and migrations.
 - **Auth**: Firebase Authentication (Google provider). Admin-only; no user accounts for shoppers.
 - **Cart**: Client-side only (localStorage). No checkout flow.
@@ -75,13 +75,13 @@ All configuration is via environment variables. For local development, sensible 
 
 ### Backend
 
-| Variable              | Required    | Default                                        | Description                                                                            |
-| --------------------- | ----------- | ---------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `DATABASE_URL`        | Production  | `postgres://shop:shop@localhost:5432/shop`     | PostgreSQL connection string                                                           |
-| `FIREBASE_PROJECT_ID` | Production  | `k8s-practice-app`                             | Firebase project ID for admin token verification                                       |
-| `PORT`                | No          | `3000`                                         | Port the backend listens on                                                            |
-| `IMAGE_STORAGE_PATH`  | No          | `./images`                                     | Directory for uploaded product images (defaults to `/data/images` in the Docker image) |
-| `CORS_ORIGIN`         | No          | `http://localhost:5173`                        | Allowed CORS origin                                                                    |
+| Variable              | Required   | Default                                    | Description                                                                            |
+| --------------------- | ---------- | ------------------------------------------ | -------------------------------------------------------------------------------------- |
+| `DATABASE_URL`        | Production | `postgres://shop:shop@localhost:5432/shop` | PostgreSQL connection string                                                           |
+| `FIREBASE_PROJECT_ID` | Production | `k8s-practice-app`                         | Firebase project ID for admin token verification                                       |
+| `PORT`                | No         | `3000`                                     | Port the backend listens on                                                            |
+| `IMAGE_STORAGE_PATH`  | No         | `./images`                                 | Directory for uploaded product images (defaults to `/data/images` in the Docker image) |
+| `CORS_ORIGIN`         | No         | `http://localhost:5173`                    | Allowed CORS origin                                                                    |
 
 The backend binds to `0.0.0.0` on the configured port.
 

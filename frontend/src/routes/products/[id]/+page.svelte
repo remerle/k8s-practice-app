@@ -23,12 +23,20 @@
 
 <a href="/" class="btn btn-ghost btn-sm mb-6">&larr; Back to products</a>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-0 bg-base-100 shadow rounded-2xl shadow-sm overflow-hidden max-w-4xl">
+<div
+  class="grid grid-cols-1 md:grid-cols-2 gap-0 bg-base-100 shadow rounded-2xl shadow-sm overflow-hidden max-w-4xl"
+>
   <figure class="aspect-square bg-base-300">
     {#if product.image_location}
-      <img src="/images/{product.image_location}" alt={product.name} class="w-full h-full object-cover" />
+      <img
+        src="/images/{product.image_location}"
+        alt={product.name}
+        class="w-full h-full object-cover"
+      />
     {:else}
-      <div class="w-full h-full flex items-center justify-center text-base-content/40 text-lg">No Image</div>
+      <div class="w-full h-full flex items-center justify-center text-base-content/40 text-lg">
+        No Image
+      </div>
     {/if}
   </figure>
   <div class="p-8 flex flex-col gap-4">
@@ -41,9 +49,7 @@
       <p class="text-base-content/80 leading-relaxed">{product.description}</p>
     {/if}
     <div class="mt-auto pt-4">
-      <button class="btn btn-primary btn-lg" onclick={addToCart}>
-        Add to Cart
-      </button>
+      <button class="btn btn-primary btn-lg" onclick={addToCart}> Add to Cart </button>
     </div>
   </div>
 </div>

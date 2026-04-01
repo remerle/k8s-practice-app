@@ -3,17 +3,18 @@
   themes: dark, light;
 }
 
-html, body {
+html,
+body {
   @apply bg-base-200 min-h-screen;
 }
 
 /* Darker navbar in dark mode for stronger contrast */
-:root[data-theme="dark"] .navbar {
+:root[data-theme='dark'] .navbar {
   @apply bg-neutral text-neutral-content;
 }
 
 /* Cards need a subtle ring to pop off dark backgrounds where shadows are invisible */
-:root[data-theme="dark"] .card {
+:root[data-theme='dark'] .card {
   @apply ring-1 ring-white/10;
 }
 
