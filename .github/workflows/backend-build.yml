@@ -10,11 +10,18 @@ permissions:
   contents: read
   packages: write
 
+env:
+  IMAGE: ghcr.io/remerle/k8s-practice-backend
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Generate version tag
+        id: version
+        run: echo "tag=$(date -u +'%Y.%m.%d').${{ github.run_number }}" >> "$GITHUB_OUTPUT"
 
       - uses: docker/login-action@v3
         with:
@@ -27,5 +34,5 @@ jobs:
           context: ./backend
           push: true
           tags: |
-            ghcr.io/remerle/k8s-practice-backend:${{ github.sha }}
-            ghcr.io/remerle/k8s-practice-backend:latest
+            ${{ env.IMAGE }}:${{ steps.version.outputs.tag }}
+            ${{ env.IMAGE }}:latest
