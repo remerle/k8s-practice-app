@@ -31,15 +31,17 @@ All config is via environment variables. See the README Configuration section fo
 
 Key points for agents:
 
-- **Backend** requires `DATABASE_URL` and `FIREBASE_PROJECT_ID`. Listens on `PORT` (default 3000), binds `0.0.0.0`.
+- **Backend** requires `DATABASE_URL` and `FIREBASE_PROJECT_ID`. Listens on `PORT` (default 3000), binds `0.0.0.0`. No CORS (only receives proxied requests from the frontend).
 - **Frontend** requires `API_URL` and all `FIREBASE_*` vars. Listens on `PORT` (default 3000 via adapter-node).
-- **Runtime env**: The frontend reads env at runtime via `$env/dynamic/private` in `+layout.server.ts`, not at build time. No `PUBLIC_` prefixed vars.
-- **Image storage**: Backend stores uploaded images to `IMAGE_STORAGE_PATH` (default `./images`) and serves them at `/images/`.
+- **Runtime env**: The frontend reads env at runtime via `$env/dynamic/private`, not at build time. No `PUBLIC_` prefixed vars. `API_URL` is server-only and never exposed to the client.
+- **API proxy**: The frontend's `hooks.server.ts` proxies `/api/*` and `/images/*` requests to the backend. Only the frontend should be exposed via ingress; the backend is an internal service.
+- **Image storage**: Backend stores uploaded images to `IMAGE_STORAGE_PATH` (default `./images`) and serves them at `/images/` (accessed by clients through the frontend proxy).
 - **Health check**: `GET /api/health` returns 200 with DB up, 503 with DB down.
 
 ## Architecture Decisions
 
 - **Runtime env config**: Supports swapping config per deployment without rebuilding.
+- **Single-ingress frontend**: The SvelteKit server proxies `/api/*` and `/images/*` to the backend via `hooks.server.ts`. The backend is not exposed externally. Client-side code uses relative paths; SSR load functions use `API_URL` directly.
 - **No ORM**: Knex query builder only. Keep queries in route handlers; no separate repository layer.
 - **Auth is admin-only**: Firebase Google auth protects `/admin` routes. The storefront is fully public. Cart lives in localStorage.
 - **Image storage on disk**: Backend writes to and serves from a configurable directory. The path is set via `IMAGE_STORAGE_PATH`.
@@ -74,9 +76,10 @@ Key constraints: `sku` must be unique (duplicate inserts will fail at the DB lev
 
 ### Frontend
 
-- Page data comes from `+page.server.ts` load functions (SSR).
-- Admin pages use client-side fetches with auth tokens (no server load).
-- The API client in `$lib/api.ts` is the single interface to the backend.
+- Page data comes from `+page.server.ts` load functions (SSR). SSR loads read `API_URL` from `$env/dynamic/private`.
+- Admin pages use client-side fetches with auth tokens (no server load). Client-side calls use relative paths (proxied via `hooks.server.ts`).
+- The API client in `$lib/api.ts` is the single interface to the backend. `apiUrl` parameter is optional; omit it for relative paths (client-side), pass `API_URL` for absolute paths (SSR).
+- `hooks.server.ts` proxies `/api/*` and `/images/*` requests to the backend, streaming request/response bodies without buffering.
 - Svelte stores in `$lib/stores/` for shared state (auth, cart).
 - Components in `$lib/components/`.
 
@@ -116,20 +119,21 @@ backend/src/
     └── 001_create_products.ts
 
 frontend/src/
+├── hooks.server.ts          # API proxy: forwards /api/* and /images/* to backend
 ├── lib/
-│   ├── api.ts             # Backend API client
-│   ├── firebase.ts        # Firebase client init
+│   ├── api.ts               # Backend API client
+│   ├── firebase.ts          # Firebase client init
 │   ├── stores/
-│   │   ├── auth.ts        # Firebase auth state
-│   │   └── cart.ts        # Cart with localStorage
+│   │   ├── auth.ts          # Firebase auth state
+│   │   └── cart.ts          # Cart with localStorage
 │   └── components/
 │       ├── ProductCard.svelte
 │       └── CartItem.svelte
 └── routes/
-    ├── +layout.server.ts  # Runtime env config (reads all env vars)
-    ├── +layout.svelte     # Nav with cart count
-    ├── +page.svelte       # Product listing
-    ├── products/[id]/     # Product detail
-    ├── cart/              # Cart page
-    └── admin/             # Auth guard, CRUD, login
+    ├── +layout.server.ts    # Runtime env config (Firebase vars only)
+    ├── +layout.svelte       # Nav with cart count
+    ├── +page.svelte         # Product listing
+    ├── products/[id]/       # Product detail
+    ├── cart/                # Cart page
+    └── admin/               # Auth guard, CRUD, login
 ```

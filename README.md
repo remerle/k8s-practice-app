@@ -5,11 +5,11 @@ A simple e-commerce application. Monorepo with separately deployable frontend an
 ## Architecture
 
 ```
-Browser --> SvelteKit Frontend --> Fastify Backend --> PostgreSQL
+Browser --> SvelteKit Frontend (proxy) --> Fastify Backend --> PostgreSQL
 ```
 
-- **Frontend**: SvelteKit with adapter-node. Storefront (product browsing, cart) is public. Admin (`/admin`) requires Google sign-in via Firebase.
-- **Backend**: Fastify REST API. Serves product data and uploaded images. Admin routes protected by Firebase Admin SDK token verification.
+- **Frontend**: SvelteKit with adapter-node. The sole ingress point; proxies `/api/*` and `/images/*` requests to the backend via `hooks.server.ts`. Storefront (product browsing, cart) is public. Admin (`/admin`) requires Google sign-in via Firebase.
+- **Backend**: Fastify REST API. Internal service (not exposed externally). Serves product data and uploaded images. Admin routes protected by Firebase Admin SDK token verification.
 - **Database**: PostgreSQL with Knex for queries and migrations.
 - **Auth**: Firebase Authentication (Google provider). Admin-only; no user accounts for shoppers.
 - **Cart**: Client-side only (localStorage). No checkout flow.
@@ -79,7 +79,7 @@ The backend binds to `0.0.0.0` on the configured port.
 
 | Variable                       | Required | Default                 | Description                                                       |
 | ------------------------------ | -------- | ----------------------- | ----------------------------------------------------------------- |
-| `API_URL`                      | No       | `http://localhost:3000` | Backend API base URL (used for both SSR and client-side requests) |
+| `API_URL`                      | No       | `http://localhost:3000` | Backend API base URL (server-only; used by SSR loads and the proxy, never exposed to the browser) |
 | `FIREBASE_API_KEY`             | No\*     | `''`                    | Firebase client API key                                           |
 | `FIREBASE_AUTH_DOMAIN`         | No\*     | `''`                    | Firebase auth domain                                              |
 | `FIREBASE_PROJECT_ID`          | No\*     | `''`                    | Firebase project ID                                               |
@@ -90,7 +90,7 @@ The backend binds to `0.0.0.0` on the configured port.
 
 \* Required for admin authentication to work. The app starts without them, but Firebase auth (Google sign-in for admin) will not function.
 
-The frontend reads all environment variables at **runtime** (not build time) via SvelteKit's `$env/dynamic/private` in the root layout server load function, then passes them to the client as page data.
+The frontend reads environment variables at **runtime** (not build time) via SvelteKit's `$env/dynamic/private`. Firebase config is passed to the client via the layout server load function. `API_URL` is server-only; the frontend proxies `/api/*` and `/images/*` requests to the backend through `hooks.server.ts`, so client-side code uses relative paths.
 
 ### Health Check
 
@@ -100,8 +100,9 @@ The backend exposes `GET /api/health` which returns `{"status": "ok"}` (200) whe
 
 ```
 application/
-├── frontend/          # SvelteKit app (adapter-node)
+├── frontend/          # SvelteKit app (adapter-node, sole ingress)
 │   ├── src/
+│   │   ├── hooks.server.ts  # API proxy to backend
 │   │   ├── lib/       # Shared code: API client, stores, components
 │   │   └── routes/    # Pages: storefront, cart, admin
 │   └── Dockerfile
