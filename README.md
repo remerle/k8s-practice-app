@@ -66,6 +66,8 @@ Frontend runs on `http://localhost:5173`, backend on `http://localhost:3000`.
 | `just check-backend`  | Type-check the backend                                         |
 | `just check-frontend` | Type-check the frontend                                        |
 | `just build`          | Build both packages                                            |
+| `just build-backend`  | Build backend only                                             |
+| `just build-frontend` | Build frontend only                                            |
 | `just validate`       | Full validation (format check + lint + typecheck both + tests) |
 | `just docker-build`   | Build Docker images locally                                    |
 
@@ -87,22 +89,22 @@ The backend binds to `0.0.0.0` on the configured port.
 
 ### Frontend
 
-| Variable                       | Required | Default                 | Description                                                                                       |
-| ------------------------------ | -------- | ----------------------- | ------------------------------------------------------------------------------------------------- |
-| `API_URL`                      | No       | `http://localhost:3000` | Backend API base URL (server-only; used by SSR loads and the proxy, never exposed to the browser) |
-| `FIREBASE_API_KEY`             | No       | dev project default     | Firebase client API key                                                                           |
-| `FIREBASE_AUTH_DOMAIN`         | No       | dev project default     | Firebase auth domain                                                                              |
-| `FIREBASE_PROJECT_ID`          | No       | dev project default     | Firebase project ID                                                                               |
-| `FIREBASE_STORAGE_BUCKET`      | No       | dev project default     | Firebase storage bucket                                                                           |
-| `FIREBASE_MESSAGING_SENDER_ID` | No       | dev project default     | Firebase messaging sender ID                                                                      |
-| `FIREBASE_APP_ID`              | No       | dev project default     | Firebase app ID                                                                                   |
-| `PORT`                         | No       | `3000`                  | Port the frontend listens on (adapter-node)                                                       |
+| Variable                       | Required | Default                 | Description                                                                                             |
+| ------------------------------ | -------- | ----------------------- | ------------------------------------------------------------------------------------------------------- |
+| `API_URL`                      | No       | `http://localhost:3000` | Backend API base URL. Read server-side; passed to the client as page data for image URLs and API calls. |
+| `FIREBASE_API_KEY`             | No       | dev project default     | Firebase client API key                                                                                 |
+| `FIREBASE_AUTH_DOMAIN`         | No       | dev project default     | Firebase auth domain                                                                                    |
+| `FIREBASE_PROJECT_ID`          | No       | dev project default     | Firebase project ID                                                                                     |
+| `FIREBASE_STORAGE_BUCKET`      | No       | dev project default     | Firebase storage bucket                                                                                 |
+| `FIREBASE_MESSAGING_SENDER_ID` | No       | dev project default     | Firebase messaging sender ID                                                                            |
+| `FIREBASE_APP_ID`              | No       | dev project default     | Firebase app ID                                                                                         |
+| `PORT`                         | No       | `3000`                  | Port the frontend listens on (adapter-node)                                                             |
 
 > [!NOTE]
 > All Firebase variables default to the shared dev project. Override them in production.
 > [Firebase console for k8s-practice-app](https://console.firebase.google.com/u/1/project/k8s-practice-app/settings/general/web:YjUyZjljOWQtZjFlYy00MzU3LWJiNzUtMGY2NjkwN2VjYmIy)
 
-The frontend reads environment variables at **runtime** (not build time) via SvelteKit's `$env/dynamic/private`. Firebase config is passed to the client via the layout server load function. `API_URL` is server-only; the frontend proxies `/api/*` and `/images/*` requests to the backend through `hooks.server.ts`, so client-side code uses relative paths.
+The frontend reads environment variables at **runtime** (not build time) via SvelteKit's `$env/dynamic/private`. The layout server load function passes both Firebase config and `apiUrl` to the client as page data. Client-side code uses the full backend URL from `$page.data.apiUrl` for image sources and API calls.
 
 ### Health Check
 
@@ -112,9 +114,8 @@ The backend exposes `GET /api/health` which returns `{"status": "ok"}` (200) whe
 
 ```
 application/
-├── frontend/          # SvelteKit app (adapter-node, sole ingress)
+├── frontend/          # SvelteKit app (adapter-node)
 │   ├── src/
-│   │   ├── hooks.server.ts  # API proxy to backend
 │   │   ├── lib/       # Shared code: API client, stores, components
 │   │   └── routes/    # Pages: storefront, cart, admin
 │   └── Dockerfile
@@ -133,7 +134,7 @@ application/
 
 ### Public
 
-- `GET /api/products` - List all products
+- `GET /api/products` - List products. Supports `?limit=` (default 50, max 100) and `?offset=` (default 0) for pagination.
 - `GET /api/products/:id` - Get single product
 - `GET /images/:filename` - Serve uploaded image
 - `GET /api/health` - Health/readiness check
@@ -163,15 +164,25 @@ Products have the following fields:
 
 `POST /api/products` and `PUT /api/products/:id` accept `multipart/form-data` with the following fields:
 
-| Field         | Type | Required     | Description                 |
-| ------------- | ---- | ------------ | --------------------------- |
-| `name`        | text | Yes (create) | Product name                |
-| `description` | text | No           | Product description         |
-| `sku`         | text | Yes (create) | Stock keeping unit (unique) |
-| `price`       | text | Yes (create) | Price as a decimal string   |
-| image         | file | No           | Product image (max 5 MB)    |
+| Field         | Type | Required     | Description                                                                       |
+| ------------- | ---- | ------------ | --------------------------------------------------------------------------------- |
+| `name`        | text | Yes (create) | Product name                                                                      |
+| `description` | text | No           | Product description                                                               |
+| `sku`         | text | Yes (create) | Stock keeping unit (unique)                                                       |
+| `price`       | text | Yes (create) | Price as a decimal string                                                         |
+| image         | file | No           | Product image, max 5 MB. Accepted types: `.jpg`, `.jpeg`, `.png`, `.gif`, `.webp` |
 
 On update (`PUT`), all fields are optional; only provided fields are changed.
+
+### Error Responses
+
+All error responses return a JSON object with a single `error` field:
+
+```json
+{ "error": "Description of what went wrong" }
+```
+
+Common status codes: 400 (validation error), 401 (missing or invalid auth token), 404 (product not found), 503 (database unreachable).
 
 ## Docker Images
 
