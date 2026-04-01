@@ -11,3 +11,13 @@ html, body {
 :root[data-theme="dark"] .card {
   @apply ring-1 ring-white/10;
 }
+
+/* Softer focus style for inputs */
+.input:focus-within,
+.textarea:focus-within,
+.select:focus-within,
+.file-input:focus {
+  outline: none !important;
+  border-color: oklch(var(--p)) !important;
+  box-shadow: 0 0 0 1px oklch(var(--p) / 0.3) !important;
+}
