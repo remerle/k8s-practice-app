@@ -5,7 +5,7 @@
 </script>
 
 <svelte:head>
-  <title>Ye Olde Shoppe</title>
+  <title>PractiKube</title>
 </svelte:head>
 
 <h1 class="text-3xl font-bold mb-6">Products</h1>
