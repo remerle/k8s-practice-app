@@ -84,17 +84,17 @@
       {/if}
 
       <form onsubmit={handleSubmit} class="space-y-4">
-        <label class="floating-label w-full">
-          <span>Name</span>
-          <input type="text" placeholder="Name" class="input input-md w-full" bind:value={name} required />
+        <label class="input w-full">
+          <span class="label">Name</span>
+          <input type="text" bind:value={name} required />
         </label>
-        <label class="floating-label w-full">
-          <span>SKU</span>
-          <input type="text" placeholder="SKU" class="input input-md w-full" bind:value={sku} required />
+        <label class="input w-full">
+          <span class="label">SKU</span>
+          <input type="text" bind:value={sku} required />
         </label>
-        <label class="floating-label w-full">
-          <span>Price</span>
-          <input type="number" step="0.01" min="0" placeholder="Price" class="input input-md w-full" bind:value={price} required />
+        <label class="input w-full">
+          <span class="label">Price</span>
+          <input type="number" step="0.01" min="0" bind:value={price} required />
         </label>
         <label class="floating-label w-full">
           <span>Description</span>
