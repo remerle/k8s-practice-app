@@ -31,8 +31,8 @@ All config is via environment variables. See the README Configuration section fo
 
 Key points for agents:
 
-- **Backend** requires `DATABASE_URL` and `FIREBASE_PROJECT_ID`. Listens on `PORT` (default 3000), binds `0.0.0.0`. No CORS (only receives proxied requests from the frontend).
-- **Frontend** requires `API_URL` and all `FIREBASE_*` vars. Listens on `PORT` (default 3000 via adapter-node).
+- **Backend** uses `DATABASE_URL` (default `postgres://shop:shop@localhost:5432/shop`) and `FIREBASE_PROJECT_ID` (default `k8s-practice-app`). These must be set explicitly in production. Listens on `PORT` (default 3000), binds `0.0.0.0`. CORS configured via `CORS_ORIGIN` env var (default `http://localhost:5173`).
+- **Frontend** uses `API_URL` (default `http://localhost:3000`) and `FIREBASE_*` vars (defaults match the `k8s-practice-app` project). These must be set explicitly in production. Listens on `PORT` (default 3000 via adapter-node).
 - **Runtime env**: The frontend reads env at runtime via `$env/dynamic/private`, not at build time. No `PUBLIC_` prefixed vars. `API_URL` is server-only and never exposed to the client.
 - **API proxy**: The frontend's `hooks.server.ts` proxies `/api/*` and `/images/*` requests to the backend. Only the frontend should be exposed via ingress; the backend is an internal service.
 - **Image storage**: Backend stores uploaded images to `IMAGE_STORAGE_PATH` (default `./images`) and serves them at `/images/` (accessed by clients through the frontend proxy).
@@ -46,6 +46,7 @@ Key points for agents:
 - **Auth is admin-only**: Firebase Google auth protects `/admin` routes. The storefront is fully public. Cart lives in localStorage.
 - **Image storage on disk**: Backend writes to and serves from a configurable directory. The path is set via `IMAGE_STORAGE_PATH`.
 - **Auto-migration**: The Knex db plugin runs `migrate.latest()` on startup. Migrations must be additive (no column drops or renames).
+- **Connection pool**: Knex is configured with pool `min: 2`, `max: 10`, acquire timeout 10s, idle timeout 30s (hardcoded in `plugins/db.ts`).
 - **Docker builds use `npm install`, not `npm ci`**: npm's lockfile (v3) only records platform-specific optional deps for the OS/arch where it was generated. Since the lockfile is generated on macOS but Docker builds run on linux, `npm ci` fails on native binaries (rollup, lightningcss, etc.). Each Dockerfile copies only its `package.json` and runs `npm install`. The root lockfile pins versions for local dev. Ideally, migrate to pnpm which handles cross-platform lockfiles correctly.
 
 ## Database Schema
@@ -80,7 +81,6 @@ Key constraints: `sku` must be unique (duplicate inserts will fail at the DB lev
 - Page data comes from `+page.server.ts` load functions (SSR). SSR loads read `API_URL` from `$env/dynamic/private`.
 - Admin pages use client-side fetches with auth tokens (no server load). Client-side calls use relative paths (proxied via `hooks.server.ts`).
 - The API client in `$lib/api.ts` is the single interface to the backend. `apiUrl` parameter is optional; omit it for relative paths (client-side), pass `API_URL` for absolute paths (SSR).
-- `hooks.server.ts` proxies `/api/*` and `/images/*` requests to the backend, streaming request/response bodies without buffering.
 - Svelte stores in `$lib/stores/` for shared state (auth, cart).
 - Components in `$lib/components/`.
 

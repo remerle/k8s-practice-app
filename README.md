@@ -5,11 +5,11 @@ A simple e-commerce application. Monorepo with separately deployable frontend an
 ## Architecture
 
 ```
-Browser --> SvelteKit Frontend --> Fastify Backend --> PostgreSQL
+Browser --> SvelteKit Frontend (proxy) --> Fastify Backend --> PostgreSQL
 ```
 
-- **Frontend**: SvelteKit with adapter-node. SSR load functions fetch product data from the backend server-side. The backend URL (`API_URL`) is also passed to the client as page data so the browser can load images and make API calls directly. Storefront (product browsing, cart) is public. Admin (`/admin`) requires Google sign-in via Firebase.
-- **Backend**: Fastify REST API. Serves product data and uploaded images. Admin routes protected by Firebase Admin SDK token verification.
+- **Frontend**: SvelteKit with adapter-node. The sole ingress point; proxies `/api/*` and `/images/*` requests to the backend via `hooks.server.ts`. Storefront (product browsing, cart) is public. Admin (`/admin`) requires Google sign-in via Firebase.
+- **Backend**: Fastify REST API. Internal service (not exposed externally). Serves product data and uploaded images. Admin routes protected by Firebase Admin SDK token verification.
 - **Database**: PostgreSQL with Knex for queries and migrations.
 - **Auth**: Firebase Authentication (Google provider). Admin-only; no user accounts for shoppers.
 - **Cart**: Client-side only (localStorage). No checkout flow.
@@ -91,7 +91,7 @@ The backend binds to `0.0.0.0` on the configured port.
 
 | Variable                       | Required | Default                 | Description                                                                                             |
 | ------------------------------ | -------- | ----------------------- | ------------------------------------------------------------------------------------------------------- |
-| `API_URL`                      | No       | `http://localhost:3000` | Backend API base URL. Read server-side; passed to the client as page data for image URLs and API calls. |
+| `API_URL`                      | No       | `http://localhost:3000` | Backend API base URL (server-only; used by SSR loads and the proxy, never exposed to the browser) |
 | `FIREBASE_API_KEY`             | No       | dev project default     | Firebase client API key                                                                                 |
 | `FIREBASE_AUTH_DOMAIN`         | No       | dev project default     | Firebase auth domain                                                                                    |
 | `FIREBASE_PROJECT_ID`          | No       | dev project default     | Firebase project ID                                                                                     |
@@ -104,7 +104,7 @@ The backend binds to `0.0.0.0` on the configured port.
 > All Firebase variables default to the shared dev project. Override them in production.
 > [Firebase console for k8s-practice-app](https://console.firebase.google.com/u/1/project/k8s-practice-app/settings/general/web:YjUyZjljOWQtZjFlYy00MzU3LWJiNzUtMGY2NjkwN2VjYmIy)
 
-The frontend reads environment variables at **runtime** (not build time) via SvelteKit's `$env/dynamic/private`. The layout server load function passes both Firebase config and `apiUrl` to the client as page data. Client-side code uses the full backend URL from `$page.data.apiUrl` for image sources and API calls.
+The frontend reads environment variables at **runtime** (not build time) via SvelteKit's `$env/dynamic/private`. Firebase config is passed to the client via the layout server load function. `API_URL` is server-only; the frontend proxies `/api/*` and `/images/*` requests to the backend through `hooks.server.ts`, so client-side code uses relative paths.
 
 ### Health Check
 
@@ -114,8 +114,9 @@ The backend exposes `GET /api/health` which returns `{"status": "ok"}` (200) whe
 
 ```
 application/
-├── frontend/          # SvelteKit app (adapter-node)
+├── frontend/          # SvelteKit app (adapter-node, sole ingress)
 │   ├── src/
+│   │   ├── hooks.server.ts  # API proxy to backend
 │   │   ├── lib/       # Shared code: API client, stores, components
 │   │   └── routes/    # Pages: storefront, cart, admin
 │   └── Dockerfile
