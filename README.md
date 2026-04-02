@@ -191,6 +191,6 @@ Images are built and pushed to ghcr.io via GitHub Actions on push to `main`:
 - `ghcr.io/remerle/k8s-practice-frontend`
 - `ghcr.io/remerle/k8s-practice-backend`
 
-Builds are path-filtered: frontend changes only rebuild the frontend image, and vice versa. Each image is tagged with both `latest` and a [CalVer](https://calver.org/) tag (`YY.MM.<buildNum>`, e.g. `26.4.7`) for version pinning.
+Builds are path-filtered: frontend changes only rebuild the frontend image, and vice versa. Each image is tagged with both `latest` and a [CalVer](https://calver.org/) tag (`Y.M.<buildNum>`, e.g. `26.4.7`) for version pinning. `Y` is the two-digit year without zero-padding, `M` is the month without zero-padding.
 
 Both images expose port 3000 by default. The backend image expects `IMAGE_STORAGE_PATH` to point to a persistent directory (defaults to `/data/images` in the container).
