@@ -37,6 +37,7 @@ jobs:
           context: ./frontend
           platforms: linux/amd64
           push: true
+          provenance: false
           tags: |
             ${{ env.IMAGE }}:${{ steps.version.outputs.tag }}-amd64
             ${{ env.IMAGE }}:latest-amd64
@@ -65,6 +66,7 @@ jobs:
           context: ./frontend
           platforms: linux/arm64
           push: true
+          provenance: false
           tags: |
             ${{ env.IMAGE }}:${{ steps.version.outputs.tag }}-arm64
             ${{ env.IMAGE }}:latest-arm64
