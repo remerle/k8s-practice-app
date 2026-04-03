@@ -6,6 +6,13 @@ const PROXIED_PREFIXES = ['/api/', '/images/'];
 export const handle: Handle = async ({ event, resolve }) => {
   const { pathname } = event.url;
 
+  if (pathname === '/api/health') {
+    return new Response(JSON.stringify({ status: 'ok' }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
   if (!PROXIED_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
     return resolve(event);
   }

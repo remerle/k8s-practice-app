@@ -89,16 +89,16 @@ The backend binds to `0.0.0.0` on the configured port.
 
 ### Frontend
 
-| Variable                       | Required | Default                 | Description                                                                                             |
-| ------------------------------ | -------- | ----------------------- | ------------------------------------------------------------------------------------------------------- |
+| Variable                       | Required | Default                 | Description                                                                                       |
+| ------------------------------ | -------- | ----------------------- | ------------------------------------------------------------------------------------------------- |
 | `API_URL`                      | No       | `http://localhost:3000` | Backend API base URL (server-only; used by SSR loads and the proxy, never exposed to the browser) |
-| `FIREBASE_API_KEY`             | No       | dev project default     | Firebase client API key                                                                                 |
-| `FIREBASE_AUTH_DOMAIN`         | No       | dev project default     | Firebase auth domain                                                                                    |
-| `FIREBASE_PROJECT_ID`          | No       | dev project default     | Firebase project ID                                                                                     |
-| `FIREBASE_STORAGE_BUCKET`      | No       | dev project default     | Firebase storage bucket                                                                                 |
-| `FIREBASE_MESSAGING_SENDER_ID` | No       | dev project default     | Firebase messaging sender ID                                                                            |
-| `FIREBASE_APP_ID`              | No       | dev project default     | Firebase app ID                                                                                         |
-| `PORT`                         | No       | `3000`                  | Port the frontend listens on (adapter-node)                                                             |
+| `FIREBASE_API_KEY`             | No       | dev project default     | Firebase client API key                                                                           |
+| `FIREBASE_AUTH_DOMAIN`         | No       | dev project default     | Firebase auth domain                                                                              |
+| `FIREBASE_PROJECT_ID`          | No       | dev project default     | Firebase project ID                                                                               |
+| `FIREBASE_STORAGE_BUCKET`      | No       | dev project default     | Firebase storage bucket                                                                           |
+| `FIREBASE_MESSAGING_SENDER_ID` | No       | dev project default     | Firebase messaging sender ID                                                                      |
+| `FIREBASE_APP_ID`              | No       | dev project default     | Firebase app ID                                                                                   |
+| `PORT`                         | No       | `3000`                  | Port the frontend listens on (adapter-node)                                                       |
 
 > [!NOTE]
 > All Firebase variables default to the shared dev project. Override them in production.
